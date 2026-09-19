@@ -46,3 +46,11 @@ Status: **Accepted** unless noted. When a decision changes, add a new ADR overri
 
 - **Date:** 2026-09-19 · **Status:** Accepted
 - **Decision:** The 7-page dashboard loads `results/*.json` + artifacts; only the counterfactual simulator recomputes in memory. Fast, deterministic, reproducible.
+
+## ADR-008 — `v_customer_analytical`: JOIN+DISTINCT instead of correlated EXISTS
+
+- **Date:** 2026-09-19 · **Status:** Accepted
+- **Context:** The first version of `v_customer_analytical` filtered purchased orders with a correlated `EXISTS (SELECT 1 FROM order_items i WHERE i.order_id = o.order_id)`. MySQL 8.0.46 fused that semi-join with the outer equi-joins on the *same* `order_items` table and produced a catastrophic plan (full order_items scan × full customers hash join). `SELECT COUNT(*)` never finished (>300 s timeout; 60 s+ on retest).
+- **Decision:** Replace the `EXISTS` filter with `JOIN order_items … SELECT DISTINCT` in the `purchased_orders` CTE. MySQL materializes the purchased-order set once and reuses it across all consumer CTEs (verified via `EXPLAIN ANALYZE`). Folded the customer geography join into the same CTE so consumers stop re-joining `customers`.
+- **Measured impact:** `SELECT COUNT(*)` = 22.8 s (was: never finished). Full `SELECT *` ≈ 35–40 s. The remaining cost is the five per-customer aggregation/window passes, which is inherent to a view on this machine.
+- **Consequences:** Cohort semantics unchanged (98,199 purchased orders, 94,983 customers). Scalar subqueries for tenure/recency are re-evaluated per output row by MySQL but each costs <50 ms against the materialized CTE. Documented in `sql/analytics/customer_analytical.sql`.

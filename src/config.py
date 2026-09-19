@@ -35,7 +35,7 @@ def load_env() -> dict:
     if not env_path.exists():
         return {}
     result: dict[str, str] = {}
-    for line in env_path.read_text(encoding="utf-8").splitlines():
+    for line in env_path.read_text(encoding="utf-8-sig").splitlines():  # utf-8-sig strips BOM
         line = line.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue

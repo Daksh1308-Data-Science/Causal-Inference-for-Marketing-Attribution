@@ -1,0 +1,25 @@
+-- ==== Olist load contract (MySQL 8.0) =============================================
+-- The bulk load itself is implemented in src/data/load_olist.py (pandas + pymysql
+-- executemany). This file documents the load contract and the post-load hygiene
+-- that the loader runs, so the SQL side is reviewable / evaluable in Workbench too.
+--
+-- Load order (FK dependencies first):
+--   1. customers   <- orders.customer_id
+--   2. geolocation
+--   3. products    <- order_items.product_id
+--   4. sellers     <- order_items.seller_id
+--   5. product_category_name_translation
+--   6. orders
+--   7. order_items
+--   8. order_payments
+--   9. order_reviews   (surrogate review_id assigned where the source is empty)
+--
+-- Post-load hygiene executed by the loader:
+--   ANALYZE TABLE customers, geolocation, products, sellers,
+--               product_category_name_translation, orders, order_items,
+--               order_payments, order_reviews;
+
+-- Row-count gate (must match data/raw/_manifest.json):
+--   customers 99,441 | orders 99,441 | order_items 112,650 | payments 103,886
+--   reviews 99,224 | products 32,951 | sellers 3,095 | geolocation 1,000,163
+--   product_category_name_translation 73

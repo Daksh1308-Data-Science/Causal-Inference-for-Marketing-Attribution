@@ -2,14 +2,14 @@
 
 Updated at the end of every day. Mirrors `docs/roadmap.md`.
 
-Last updated: **Day 1** (2026-09-19)
+Last updated: **Day 2 — complete** (2026-09-19)
 
 ## Current state
 
 | Phase | Status |
 |---|---|
 | Governance docs | ✅ Done (Day 0) |
-| Week 1 — Data + Causal framework (Days 1–7) | 🟡 Next: Day 2 |
+| Week 1 — Data + Causal framework (Days 1–7) | 🟡 Day 2 complete; Days 3–7 next |
 | Week 2 — Treatment effect estimation (Days 8–14) | ⬜ Not started |
 | Week 3 — Business + robustness + product (Days 15–21) | ⬜ Not started |
 
@@ -35,15 +35,29 @@ Last updated: **Day 1** (2026-09-19)
 - [x] `data/raw/_manifest.json` written (rows + sha256 per file) for Day 2 schema tests
 - [x] Skeleton: `src/config.py` (config/.env loader), `src/data/download_olist.py`, `configs/config.yaml` (paths, seed, outcome window, Olist registry)
 
-## In progress
-
-Nothing currently in progress.
+### Day 2 — Data engineering ✅
+- [x] `sql/schema.sql` — 9-table DDL (FK-safe drop/create, utf8mb4, MySQL 8)
+- [x] `sql/load.sql` — load contract + FK order + row-count gate documented
+- [x] Bulk load via `src/data/load_olist.py` (pandas + pymysql executemany, one transaction per table) — **all 9 tables loaded, every row count matches `data/raw/_manifest.json`**
+- [x] Dirty-data handling (reported in `data/processed/_load_report.json`, never hidden):
+  - `order_reviews`: 814 duplicate `review_id` values → surrogate UUIDs (0 empty)
+  - `order_payments`: 0 empty `payment_type`
+  - no-item valid orders: 8 (5 created, 2 invoiced, 1 shipped)
+- [x] `sql/analytics/customer_analytical.sql` — `v_customer_analytical` view (real Olist data only; no sim_* columns)
+  - Cohort (final definition): customers with ≥1 **purchased order** = non-canceled/unavailable order with ≥1 `order_items` row → **N = 94,983**; 7 customers excluded (only no-item pipeline orders)
+  - `customer_unique_id` multi-state quirk: 39 customers → state assigned from earliest purchased order
+  - **Performance fix (ADR-008):** replaced the correlated `EXISTS` over `order_items` (which MySQL fused with the same-table equi-join into a plan that never finished — >300 s) with `JOIN order_items … SELECT DISTINCT`. Measured: `SELECT COUNT(*)` 22.8 s (was: never finished). Prerequisite discovered: interrupted/harness-killed client sessions left zombie server queries holding the view metadata lock — these must be `KILL`ed before re-creating the view.
+- [x] `src/data/build_analytical.py` – materializes the view → `data/processed/customer_analytical.parquet` (94,983 × 12 cols)
+- [x] `tests/test_data_schema.py` — **25 tests pass** covering: raw table rows vs manifest, no duplicate/null PKs, cohort count = 94,983, cohort contains only purchased orders, parquet schema/dtypes, no null keys/revenue, RFM plausibility, revenue tracks order count
+- [x] **Full suite: 50/50 tests pass** (25 env gate + 25 data schema). **Day 2 validation hook green.**
+- [x] Docker housekeeping requested by user: dropped unrelated databases (`creative_studio`, `text_to_sql`, `sakila`, `world`, `newschema`); MySQL now contains only `olist` + system schemas.
+- [x] Operational cleanup: `.env` had a UTF-8 BOM (broke `DB_HOST`); `src/config.py` now reads `.env` as `utf-8-sig`. `olist_app` DB password re-synced to `.env`.
 
 ## Blockers
 
-None. (MySQL root access resolved on Day 1; `olist_app` is the pipeline user going forward.)
+None.
 
 ## Next actions
 
-1. **Day 2 — Data engineering:** `sql/schema.sql` + `sql/load.sql`, bulk-load the 9 tables into MySQL `olist`, build `customer_analytical` view (RFM / tenure / category / state / seasonality), export processed parquet to `data/processed/`.
-2. Stop at the end of Day 7 for **Gate 1** validation.
+1. **Days 3–7:** EDA + cohorts (Day 3) → confounder audit (Day 4) → causal DAG (Day 5) → propensity scores (Day 6) → PSM + balance (Day 7).
+2. **Gate 1** — STOP after Day 7 and get human validation before Week 2.

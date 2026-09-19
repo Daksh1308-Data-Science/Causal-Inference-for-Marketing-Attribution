@@ -1,0 +1,43 @@
+{
+  "tables": {
+    "customers": {
+      "rows": 99441,
+      "source_rows": 99441
+    },
+    "geolocation": {
+      "rows": 1000163,
+      "source_rows": 1000163
+    },
+    "order_items": {
+      "rows": 112650,
+      "source_rows": 112650
+    },
+    "order_payments": {
+      "payment_type_empty_to_unknown": 0,
+      "rows": 103886,
+      "source_rows": 103886
+    },
+    "order_reviews": {
+      "review_id_duplicate_imputed": 814,
+      "review_id_empty_imputed": 0,
+      "rows": 99224,
+      "source_rows": 99224
+    },
+    "orders": {
+      "rows": 99441,
+      "source_rows": 99441
+    },
+    "product_category_name_translation": {
+      "rows": 73,
+      "source_rows": 73
+    },
+    "products": {
+      "rows": 32951,
+      "source_rows": 32951
+    },
+    "sellers": {
+      "rows": 3095,
+      "source_rows": 3095
+    }
+  }
+}
