@@ -1,0 +1,37 @@
+# --- Core data ---
+numpy
+pandas
+scipy
+pyarrow
+
+# --- Causal stack (the risk: DoWhy 0.8 new API + Py3.14 wheels) ---
+dowhy==0.8
+causalml>=0.17
+econml>=0.17
+
+# --- Stats / econometrics ---
+statsmodels>=0.15
+
+# --- Modeling backend for causalml (lightgbm is the heavy wheel) ---
+scikit-learn
+lightgbm
+xgboost
+
+# --- DAG rendering (NO pygraphviz/pygraphviz: native-build risk on Windows) ---
+networkx
+matplotlib
+plotly
+kaleido      # plotly static image export
+
+# --- PostgreSQL driver (psycopg3, pure/binary wheels) ---
+psycopg[binary]
+
+# --- Dashboard ---
+streamlit
+
+# --- Project utils ---
+python-dotenv
+joblib
+
+# --- Tests ---
+pytest
