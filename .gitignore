@@ -1,0 +1,32 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# --- Environments ---
+.venv/
+venv/
+env/
+
+# --- Secrets ---
+.env
+*.env.local
+
+# --- Data (keep repo lean; download on Day 1) ---
+data/raw/
+data/processed/*.parquet
+data/simulated/
+
+# --- Optional large intermediates ---
+*.db
+*.sqlite3
+
+# --- OS/editor ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
