@@ -1,0 +1,32 @@
+# --- Core data ---
+pandas>=2.2
+numpy>=1.26
+pyarrow>=16.0
+python-dotenv>=1.0
+
+# --- Databases ---
+pymysql>=1.1
+SQLAlchemy>=2.0
+
+# --- Stats & ML ---
+statsmodels>=0.14
+scipy>=1.13
+scikit-learn>=1.4
+lightgbm>=4.3
+xgboost>=2.0
+
+# --- Causal stack (ADR-004: pinned classical DoWhy 0.8 API) ---
+dowhy==0.8
+causalml>=0.15
+econml>=0.14
+
+# --- Viz ---
+matplotlib>=3.8
+seaborn>=0.13
+plotly>=5.20
+networkx>=3.2
+
+# --- App & tests ---
+streamlit>=1.33
+pytest>=8.0
+PyYAML>=6.0

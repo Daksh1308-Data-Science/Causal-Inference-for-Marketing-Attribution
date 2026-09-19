@@ -14,7 +14,7 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 
 | Day | Focus | Tasks (Python / SQL) | Deliverable | Validation | Commit | Status |
 |-----|-------|----------------------|-------------|------------|--------|:------:|
-| 1 | Env + data | Restore pinned reqs into `.venv`; extended env gate (dowhy0.8 classic API, causalml, econml, streamlit, pymysql); verify MySQL80 + credentials in `.env`; create `olist` DB + `olist_app` user; download Olist CSVs → `data/raw/` | Working env + raw data in MySQL | Imports pass; live DB connection; row counts vs Olist docs | `Day 1: env gate + MySQL ingestion` | ⬜ |
+| 1 | Env + data | Restore pinned reqs into `.venv`; extended env gate (dowhy0.8 classic API, causalml, econml, streamlit, pymysql); verify MySQL80 + credentials in `.env`; create `olist` DB + `olist_app` user; download Olist CSVs → `data/raw/` | Working env + raw data in MySQL | Imports pass; live DB connection; row counts vs Olist docs | `Day 1: env gate + MySQL ingestion` | ✅ |
 | 2 | Data engineering | `schema.sql`, `load.sql`; bulk-load 9 tables; `customer_analytical` view → RFM / tenure / category / state / seasonality; processed parquet | Analytical dataset | Schema tests pass; no dupes; RFM plausible | `Day 2: customer analytical dataset` | ⬜ |
 | 3 | EDA | Missingness, outliers, distributions, cohorts, retention, RFM segmentation; channel descriptive stats (sim preview) | `notebooks/01_eda` + figures | Distributions sane; ~96k customers / ~100k orders | `Day 3: EDA + cohorts` | ⬜ |
 | 4 | Confounders | Classify every variable: confounder / treatment / outcome / mediator / collider / irrelevant, with rationale | Confounder audit table | Each row causally justified | `Day 4: confounder audit` | ⬜ |
@@ -56,7 +56,7 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 
 ## Progress summary (updated after every day)
 
-- **Completed:** Day 0
+- **Completed:** Day 0, Day 1
 - **In progress:** —
-- **Next up:** Day 1 (blocked on MySQL credentials — see `docs/status.md`)
-- **Blockers:** MySQL root/admin credentials needed for Day 1 DB setup.
+- **Next up:** Day 2 — `schema.sql` + `load.sql`, bulk-load 9 tables, `customer_analytical` view, processed parquet
+- **Blockers:** none (MySQL credentials resolved on Day 1)
