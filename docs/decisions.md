@@ -92,3 +92,21 @@ Status: **Accepted** unless noted. When a decision changes, add a new ADR overri
   - `reports/confounder_audit.md` includes the full identification strategy (AGENTS.md §3) written before fitting, per channel.
   - `adjustment_sets()` is the single source of truth for Day-5 DAG and Day-6/7 estimators.
   - Category/state/seasonality are confounders by design — estimators must include them once the full sim activates them.
+
+## ADR-014 — DAG construction with DoWhy 0.8 + networkx/plotly (no pygraphviz)
+
+- **Date:** 2026-09-20 · **Status:** Accepted
+- **Context:** Day-5 requires per-channel causal DAGs showing nodes, edges, backdoor paths, and adjustment sets. DoWhy 0.8 classic API (`CausalModel` + `identify_effect`) is the mandated causal engine. DAG rendering must avoid `pygraphviz` (native-build risk on Windows per ADR-005).
+- **Decision:**
+  - `src/causal/dag.py` uses DoWhy's `common_causes` parameter (cleaner than graph string parsing) for identification.
+  - Interactive DAGs rendered via `networkx` (spring layout with manual positioning) + `plotly` → `results/figures/dag_{channel}.html`.
+  - Nodes: treatment, primary/secondary outcomes, observed confounders (from `adjustment_sets()`), unobserved confounder `sim_u`, conceptual mediator `click/session`, conceptual collider `co-exposure count`.
+  - Edges reflect the preview DGP: confounders → treatment + outcome; `sim_u` → treatment + outcome; treatment → outcome → revenue; treatment → mediator → outcome; treatment → collider ← other treatments.
+  - Backdoor paths enumerated explicitly; adjustment set = observed confounders per channel; `sim_u` path remains open (by design, sensitivity analysis Day 18).
+  - `dag_summary()` generates text report for `reports/` integration.
+- **Consequences:**
+  - Adjustment sets mechanically match Day-4 audit (`adjustment_sets()` single source of truth).
+  - DoWhy identification validates the backdoor criterion; fallback estimand object if graph parsing fails.
+  - No pygraphviz dependency — pure Python stack (networkx + pydot for DoWhy, plotly for viz).
+  - DAGs are interactive HTML — reviewers can hover for node roles, zoom, pan.
+  - Per-channel DAGs align with per-channel identification strategy (AGENTS.md §3).

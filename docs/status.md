@@ -2,14 +2,14 @@
 
 Updated at the end of every day. Mirrors `docs/roadmap.md`.
 
-Last updated: **Day 4 — complete** (2026-09-20)
+Last updated: **Day 5 — complete** (2026-09-20)
 
 ## Current state
 
 | Phase | Status |
 |---|---|
 | Governance docs | ✅ Done (Day 0) |
-| Week 1 — Data + Causal framework (Days 1–7) | 🟡 Day 4 complete; Days 5–7 next |
+| Week 1 — Data + Causal framework (Days 1–7) | 🟡 Day 5 complete; Days 6–7 next |
 | Week 2 — Treatment effect estimation (Days 8–14) | ⬜ Not started |
 | Week 3 — Business + robustness + product (Days 15–21) | ⬜ Not started |
 
@@ -74,11 +74,20 @@ Last updated: **Day 4 — complete** (2026-09-20)
 - [x] `tests/test_confounder_audit.py` — 14 tests: every row has rationale, roles/adjust valid, treatments/outcomes present, adjustment sets match config, sim_u/confounders/mediators/colliders/ground-truth classified correctly
 - [x] **Full suite: 86/86 tests pass** (28 env gate + 25 data schema + 18 EDA + 14 confounder audit). **Day 4 validation hook green.**
 
+### Day 5 — Causal DAG ✅
+- [x] `src/causal/dag.py` — DoWhy 0.8 classic API (`CausalModel` + `common_causes`) + networkx + plotly rendering (no pygraphviz)
+- [x] Per-channel DAGs: `results/figures/dag_{email,social,search,display}.html` — interactive HTML with node roles (treatment, outcome, confounder, unobserved, mediator, collider) color-coded
+- [x] Nodes per DAG: treatment `sim_exposed_{channel}`, primary outcome `sim_converted_14d`, secondary outcome `sim_revenue_14d`, unobserved confounder `sim_u`, observed confounders (from config targeting coefs), conceptual mediator `click/session`, conceptual collider `co-exposure count`
+- [x] Backdoor paths enumerated per channel: all observed confounders + unobserved `sim_u` (flagged as sensitivity target)
+- [x] Sufficient adjustment sets match confounder audit exactly (mechanically derived from config)
+- [x] `tests/test_dag.py` — 9 tests: DAG files exist, nodes present, adjustment sets match audit, backdoor paths include confounders + sim_u, DoWhy identification works, no pygraphviz import
+- [x] **Full suite: 95/95 tests pass** (28 env gate + 25 data schema + 18 EDA + 14 confounder audit + 9 DAG). **Day 5 validation hook green.**
+
 ## Blockers
 
 None.
 
 ## Next actions
 
-1. **Days 4–7:** confounder audit (Day 4) → causal DAG (Day 5) → propensity scores (Day 6) → PSM + balance (Day 7).
+1. **Days 6–7:** propensity scores (Day 6) → PSM + balance (Day 7).
 2. **Gate 1** — STOP after Day 7 and get human validation before Week 2.
