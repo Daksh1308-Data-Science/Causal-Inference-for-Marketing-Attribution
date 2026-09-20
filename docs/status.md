@@ -2,14 +2,14 @@
 
 Updated at the end of every day. Mirrors `docs/roadmap.md`.
 
-Last updated: **Day 5 — complete** (2026-09-20)
+Last updated: **Day 6 — complete** (2026-09-20)
 
 ## Current state
 
 | Phase | Status |
 |---|---|
 | Governance docs | ✅ Done (Day 0) |
-| Week 1 — Data + Causal framework (Days 1–7) | 🟡 Day 5 complete; Days 6–7 next |
+| Week 1 — Data + Causal framework (Days 1–7) | 🟡 Day 6 complete; Day 7 next |
 | Week 2 — Treatment effect estimation (Days 8–14) | ⬜ Not started |
 | Week 3 — Business + robustness + product (Days 15–21) | ⬜ Not started |
 
@@ -83,11 +83,22 @@ Last updated: **Day 5 — complete** (2026-09-20)
 - [x] `tests/test_dag.py` — 9 tests: DAG files exist, nodes present, adjustment sets match audit, backdoor paths include confounders + sim_u, DoWhy identification works, no pygraphviz import
 - [x] **Full suite: 95/95 tests pass** (28 env gate + 25 data schema + 18 EDA + 14 confounder audit + 9 DAG). **Day 5 validation hook green.**
 
+### Day 6 — Propensity Scores ✅
+- [x] `src/causal/propensity.py` — per-channel logistic regression PS (statsmodels) using Day-4/5 adjustment sets
+- [x] PS diagnostics for all 4 channels: overlap plots, PS distributions, SMD love plots (before matching)
+- [x] `results/figures/ps_overlap_{channel}.html` — interactive histograms with common support shading
+- [x] `results/figures/ps_distribution_{channel}.html` — violin/box plots by treatment status
+- [x] `results/figures/smd_before_{channel}.html` — SMD love plots with 0.1 threshold lines
+- [x] Key findings: all channels have common support; no PS < 0.01; email has 71 units with PS ≈ 1.0 (low ESS=3.2); social/search/display ESS 70-92%
+- [x] Logistic regression converged for all channels (pseudo R² 0.01–0.06)
+- [x] `tests/test_propensity.py` — 13 tests: PS estimated, overlap exists, no near-0 PS, ESS reported, adjustment sets match audit, SMD computed
+- [x] **Full suite: 108/108 tests pass** (28 env gate + 25 data schema + 18 EDA + 14 confounder audit + 9 DAG + 13 propensity). **Day 6 validation hook green.**
+
 ## Blockers
 
 None.
 
 ## Next actions
 
-1. **Days 6–7:** propensity scores (Day 6) → PSM + balance (Day 7).
+1. **Day 7:** PSM nearest-neighbor + covariate balance (SMD < 0.1) + assumptions checklist.
 2. **Gate 1** — STOP after Day 7 and get human validation before Week 2.

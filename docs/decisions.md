@@ -110,3 +110,22 @@ Status: **Accepted** unless noted. When a decision changes, add a new ADR overri
   - No pygraphviz dependency — pure Python stack (networkx + pydot for DoWhy, plotly for viz).
   - DAGs are interactive HTML — reviewers can hover for node roles, zoom, pan.
   - Per-channel DAGs align with per-channel identification strategy (AGENTS.md §3).
+
+## ADR-015 — Propensity score estimation with statsmodels + overlap diagnostics
+
+- **Date:** 2026-09-20 · **Status:** Accepted
+- **Context:** Day-6 requires per-channel propensity scores with overlap diagnostics (PS distributions, common support, SMD before matching). The adjustment sets are fixed from Day-4 audit / Day-5 DAG. Must avoid near-0/1 PS for positivity.
+- **Decision:**
+  - `src/causal/propensity.py` uses `statsmodels.Logit` for interpretable coefficients + convergence reporting.
+  - Features standardized via `StandardScaler`; missing `review_score_avg` imputed with median (only 684/94983 missing, email channel only).
+  - Diagnostics per channel: PS overlap histogram (common support shaded), PS distribution violin plot, SMD love plot (before matching).
+  - ESS computed for IPW weights: `ESS = (sum(w))² / sum(w²)`.
+  - Extreme PS flagged (< 0.01 or > 0.99).
+  - Outputs: 12 interactive HTML figures (3 per channel) in `results/figures/`.
+- **Consequences:**
+  - All 4 channels have common support (overlap region non-empty).
+  - No PS < 0.01 (positivity satisfied at lower bound).
+  - Email channel has 71 units with PS = 1.0 (perfect prediction) → ESS = 3.2 (0.003%) — will need trimming/clipping for IPW (Day 10).
+  - Social/search/display ESS 70-92% — acceptable for IPW.
+  - SMD before matching shows meaningful imbalance (|SMD| > 0.1 for several confounders), justifying matching (Day 7).
+  - Adjustment sets mechanically match Day-4/5 audit.
