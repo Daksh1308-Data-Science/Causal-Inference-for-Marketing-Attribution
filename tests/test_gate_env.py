@@ -40,6 +40,9 @@ REQUIRED_PACKAGES = [
     "seaborn",
     "plotly",
     "networkx",
+    "nbformat",
+    "nbclient",
+    "ipykernel",
     "streamlit",
 ]
 

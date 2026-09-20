@@ -1,0 +1,1 @@
+"""Feature engineering & descriptive analysis package (AGENTS.md §6)."""

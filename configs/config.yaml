@@ -10,11 +10,55 @@ paths:
   reports: reports
   notebooks: notebooks
 
+# --- Results layout ---
+results:
+  figures: figures     # results/figures
+  tables: tables       # results/tables
+
 # --- Reproducibility ---
 seed: 42
 
 # --- Causal analysis window ---
 outcome_window_days: 14
+
+# --- Simulated marketing layer (design: docs/data-feasibility.md §4) ---
+# Day 3 ships a clearly-labeled PREVIEW of the layer so channel descriptive
+# stats can be shown; the full campaign-date structure lands in Week 2.
+# All variables produced here are prefixed sim_ and NEVER presented as
+# observed Olist facts (AGENTS.md §2).
+simulation:
+  preview:
+    # latent intent U ~ N(0, u_std) drives assignment AND outcome => residual
+    # confounding is built in on purpose; later sensitivity analysis uses it.
+    u_std: 1.0
+    u_assignment_coef: 0.8
+    u_outcome_coef: 1.0
+    # baseline 14-day purchase intent (log-odds) for an "average" customer
+    base_outcome_intercept: -1.6
+    channels:
+      email:
+        assignment_intercept: -1.0
+        assignment_coefs: { recency_days: -0.4, total_revenue: 0.5, order_count: 0.3, review_score_avg: 0.1 }
+        effect_log_odds: 0.12
+        narrative: "reactivation works"
+      search:
+        assignment_intercept: -0.8
+        assignment_coefs: { tenure_days: -0.3, order_count: 0.4, total_revenue: 0.3 }
+        effect_log_odds: 0.15
+        narrative: "captures demand"
+      display:
+        assignment_intercept: -0.6
+        assignment_coefs: { recency_days: -0.2, total_revenue: 0.2 }
+        effect_log_odds: 0.0
+        narrative: "apparent effect is pure confounding"
+      social:
+        assignment_intercept: -1.2
+        assignment_coefs: { order_count: 0.5, total_revenue: 0.3, tenure_days: 0.2 }
+        effect_log_odds: -0.08
+        narrative: "sleeping dogs"
+    # simulated 14-day revenue when converted: exp(N(mu, sigma))
+    revenue_log_mean: 4.6
+    revenue_log_sigma: 0.8
 
 # --- Olist raw-data registry (source: documented Kaggle row counts / mirror verification) ---
 olist:

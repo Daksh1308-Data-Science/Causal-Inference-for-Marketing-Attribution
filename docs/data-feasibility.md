@@ -20,7 +20,7 @@ Per `Plan.md` §3: *"Do NOT fabricate treatment variables and pretend they are r
 | product_category_name_translation | category EN mapping | readability |
 | geolocation | zip → lat/lon | regional controls |
 
-Scale (verify at load, Day 1): ~100k orders, ~96k unique customers, 2017-08 → 2018-08, ~74 categories, 11 states (SP dominant). **Repurchase rate is low (~6%)** → RFM features are sparse; the campaign design must include an explicit "new customer" segment where recency is undefined.
+Scale (verify at load, Day 1): ~100k orders, ~96k unique customers, 2017-08 → 2018-08, ~74 categories, 11 states (SP dominant). **Repurchase rate is very low** — measured 97.0% one-time buyers in the analytical cohort (Day 3) → RFM features are sparse; the campaign design must include an explicit "new customer" segment where recency is undefined.
 
 ## 3. What Olist lacks (why causal claims need simulation)
 
@@ -54,6 +54,21 @@ Purpose: give the pipeline a *known-ground-truth* treatment effect world with re
 - **Outputs:** rows per customer × campaign with `sim_*` exposure flags, a `sim_ground_truth` effect column (or lookup table), and outcome. Every column named `sim_*` is simulated.
 
 **This is a synthetic-exercise layer for methodology validation — NOT a claim about real Olist marketing.**
+
+### 4.1 Day-3 preview (single snapshot)
+
+The full campaign-date grid lands in Week 2 when the analysis dataset is finalized. Day 3 ships a **preview** of the layer — one campaign snapshot on the full analytical cohort (94,983 customers) — solely so EDA can show channel descriptive stats and Days 6–7 can start propensity/matching. Implemented in `simulation/simulate_marketing.py` (ADR-012). Variables emitted:
+
+| Column | Meaning |
+|---|---|
+| `sim_u` | latent purchase intent ~ N(0, u_std); drives assignment AND conversion (confounding by design) |
+| `sim_p_<channel>` | targeting probability per channel = `logistic(intercept + coefs·z(features) + u_coef·sim_u)` |
+| `sim_exposed_<channel>` | 0/1 exposure drawn from `sim_p_<channel>` (email, social, search, display) |
+| `sim_ground_truth_<channel>` | embedded true effect (log-odds) used by the DGP; the benchmark Days 8–12 estimators must recover |
+| `sim_converted_14d` | 0/1 purchase within the 14-day outcome window |
+| `sim_revenue_14d` | follow-on revenue; lognormal when converted, 0 otherwise |
+
+Config-driven (intercepts, coefficients, effects, `u_std`, revenue moments) under `simulation.preview` in `configs/config.yaml`; RNG seeded from the config `seed` (deterministic). Naive conversion-by-exposure differences shown in `notebooks/01_eda` §8 are **descriptive, NOT causal** — they will not match `sim_ground_truth_*` precisely because confounders (including `sim_u`) bias the raw gap.
 
 ## 5. How this maps onto real advertising data
 

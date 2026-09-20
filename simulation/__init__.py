@@ -1,0 +1,1 @@
+"""Clearly-labeled simulated marketing layer (see simulate_marketing.py)."""

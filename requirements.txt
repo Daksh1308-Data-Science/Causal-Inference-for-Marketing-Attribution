@@ -26,6 +26,11 @@ seaborn>=0.13
 plotly>=5.20
 networkx>=3.2
 
+# --- Notebooks (Day 3 EDA deliverable) ---
+nbformat>=5.10
+nbclient>=0.10
+ipykernel>=6.29
+
 # --- App & tests ---
 streamlit>=1.33
 pytest>=8.0

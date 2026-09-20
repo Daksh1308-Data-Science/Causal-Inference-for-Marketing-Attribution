@@ -54,3 +54,30 @@ Status: **Accepted** unless noted. When a decision changes, add a new ADR overri
 - **Decision:** Replace the `EXISTS` filter with `JOIN order_items … SELECT DISTINCT` in the `purchased_orders` CTE. MySQL materializes the purchased-order set once and reuses it across all consumer CTEs (verified via `EXPLAIN ANALYZE`). Folded the customer geography join into the same CTE so consumers stop re-joining `customers`.
 - **Measured impact:** `SELECT COUNT(*)` = 22.8 s (was: never finished). Full `SELECT *` ≈ 35–40 s. The remaining cost is the five per-customer aggregation/window passes, which is inherent to a view on this machine.
 - **Consequences:** Cohort semantics unchanged (98,199 purchased orders, 94,983 customers). Scalar subqueries for tenure/recency are re-evaluated per output row by MySQL but each costs <50 ms against the materialized CTE. Documented in `sql/analytics/customer_analytical.sql`.
+
+## ADR-009 — Notebooks are built + executed by script, not hand-typed
+
+- **Date:** 2026-09-20 · **Status:** Accepted
+- **Context:** The Day-2 artifacts were plain Python; Days 3+ deliver narrated notebooks (`notebooks/01_eda → 07_sensitivity`). Hand-written notebooks risk stale/invented outputs.
+- **Decision:** Every notebook is *constructed* from narrative markdown + code cells in `scripts/build_notebook_01.py` (code cells only call `src/` modules) and *executed* for real with `nbclient` against a registered venv kernel (`causal-marketing`). Committed notebooks therefore contain genuine outputs and are reproducible by re-running the builder. `nbformat`, `nbclient`, `ipykernel` added to `requirements.txt`; env gate extended.
+- **Consequences:** Reviewers can trust every number in the committed notebook. `src/visualization/plots.py` forces the Agg backend only *outside* ipykernel so inline figures still render.
+
+## ADR-010 — `v_order_monthly` order-level table for cohorts/retention
+
+- **Date:** 2026-09-20 · **Status:** Accepted
+- **Context:** Day-3 retention/cohort analysis needs order-level monthly activity, but the Day-2 deliverable is a customer-level table.
+- **Decision:** New view `sql/analytics/order_monthly.sql` (per customer × purchase-month: order_count, revenue; purchased-order semantics as in ADR-008) materialized by `src/data/build_order_monthly.py` → `data/processed/order_monthly.parquet`. Cohorts/retention computed from it in `src/features/cohorts.py`.
+- **Verification:** 96,861 customer-month rows; 94,983 distinct customers; 98,199 orders — consistent with the Day-2 cohort.
+
+## ADR-011 — RFM uses frequency bands, not quantiles
+
+- **Date:** 2026-09-20 · **Status:** Accepted
+- **Context:** Olist is ~97% one-time buyers, so a quantile-binned frequency score collapses (P(F=1)≈0.97).
+- **Decision:** `src/features/rfm.py` scores R/M by quantiles but F by explicit bands (1 / 2 / 3-4 / 5-9 / 10+). Composite `rfm_score = 100R + 10F + M`; documented segment mapping. Descriptive only — segmentation feeds the Day-4 confounder audit and Day-5 DAG.
+
+## ADR-012 — Simulation preview ships on Day 3 (single snapshot)
+
+- **Date:** 2026-09-20 · **Status:** Accepted
+- **Context:** The roadmap's Day-3 EDA includes "channel descriptive stats (sim preview)", and Days 6-7 (propensity, matching) already need `sim_*` exposure inputs.
+- **Decision:** `simulation/simulate_marketing.py` implements the Day-3 *preview*: a single campaign snapshot (no per-campaign date grid yet) with logistic targeting per channel, latent `sim_u` confounding by design, embedded `sim_ground_truth_*` effects from config, and a 14-day conversion + lognormal revenue outcome. All columns `sim_*`-prefixed; naive conversions reported as *descriptive, not causal*. The full campaign-date grid lands in Week 2 when the analysis dataset is finalized.
+- **Consequences:** Day-6/7 estimators can already run against `data/simulated/sim_preview.parquet`; results are clearly labeled as simulation-preview outputs in `notebooks/01_eda` §8.

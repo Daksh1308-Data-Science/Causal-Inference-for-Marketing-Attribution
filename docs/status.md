@@ -2,14 +2,14 @@
 
 Updated at the end of every day. Mirrors `docs/roadmap.md`.
 
-Last updated: **Day 2 — complete** (2026-09-19)
+Last updated: **Day 3 — complete** (2026-09-20)
 
 ## Current state
 
 | Phase | Status |
 |---|---|
 | Governance docs | ✅ Done (Day 0) |
-| Week 1 — Data + Causal framework (Days 1–7) | 🟡 Day 2 complete; Days 3–7 next |
+| Week 1 — Data + Causal framework (Days 1–7) | 🟡 Day 3 complete; Days 4–7 next |
 | Week 2 — Treatment effect estimation (Days 8–14) | ⬜ Not started |
 | Week 3 — Business + robustness + product (Days 15–21) | ⬜ Not started |
 
@@ -53,11 +53,23 @@ Last updated: **Day 2 — complete** (2026-09-19)
 - [x] Docker housekeeping requested by user: dropped unrelated databases (`creative_studio`, `text_to_sql`, `sakila`, `world`, `newschema`); MySQL now contains only `olist` + system schemas.
 - [x] Operational cleanup: `.env` had a UTF-8 BOM (broke `DB_HOST`); `src/config.py` now reads `.env` as `utf-8-sig`. `olist_app` DB password re-synced to `.env`.
 
+### Day 3 — EDA + cohorts ✅
+- [x] Notebook tooling added (ADR-009): `nbformat`, `nbclient`, `ipykernel` in `requirements.txt` + env gate; venv kernel `causal-marketing` registered; notebooks built by script and executed for real (`scripts/build_notebook_01.py` → `notebooks/01_eda.ipynb`, 27 cells, 15 code cells with genuine outputs, 0 errors)
+- [x] `sql/analytics/order_monthly.sql` (ADR-010) + `src/data/build_order_monthly.py` → `data/processed/order_monthly.parquet`: 96,861 customer-month rows, 94,983 customers, 98,199 orders — consistent with the Day-2 cohort
+- [x] `src/features/eda.py` — missingness, IQR outliers, univariate distribution summaries. Observed: missingness only in review/category proxies (684 / 1,299); revenue right-skewed (median R$108, max R$13.7k); **97.0% one-time buyers**
+- [x] `src/features/cohorts.py` — acquisition cohorts + retention matrix (m+0..m+12). Observed: 94,983 customers acquired 2016-09 → 2018-09; retention drops steeply (one-transaction marketplace)
+- [x] `src/features/rfm.py` (ADR-011) — R/M quantiles + F bands (1/2/3-4/5-9/10+) → segments led by `one_time_lapsed` (38.8%) / `new_customer` (31.9%) / `big_spender` (11.9%)
+- [x] `simulation/simulate_marketing.py` (ADR-012) — clearly-labeled sim preview: deterministic, config-driven targeting + latent `sim_u` + `sim_ground_truth_*` effects + 14-day conversion/revenue outcome → `data/simulated/sim_preview.parquet` (94,983 × 27)
+- [x] `src/visualization/plots.py` → **13 figures** in `results/figures/` (missingness, outliers, distributions, states, categories, monthly activity, retention heatmap, RFM segments, sim exposure/conversion)
+- [x] `tests/test_eda.py` — **18 tests pass** (cohort scale, distribution sane-ness, missingness contract, retention structure, RFM partition, sim_* prefix contract, determinism, ground-truth match vs config, figures written)
+- [x] Docs: ADR-009…012, `docs/data-feasibility.md` §4.1 (Day-3 preview variables documented per AGENTS §2), roadmap Day 3 ✅, repurchase-rate note updated to observed 97% one-time
+- [x] **Full suite: 71/71 tests pass** (28 env gate + 25 data schema + 18 EDA). **Day 3 validation hook green.**
+
 ## Blockers
 
 None.
 
 ## Next actions
 
-1. **Days 3–7:** EDA + cohorts (Day 3) → confounder audit (Day 4) → causal DAG (Day 5) → propensity scores (Day 6) → PSM + balance (Day 7).
+1. **Days 4–7:** confounder audit (Day 4) → causal DAG (Day 5) → propensity scores (Day 6) → PSM + balance (Day 7).
 2. **Gate 1** — STOP after Day 7 and get human validation before Week 2.
