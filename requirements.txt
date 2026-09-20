@@ -31,6 +31,9 @@ nbformat>=5.10
 nbclient>=0.10
 ipykernel>=6.29
 
+# --- Reports (Day 4 confounder audit markdown tables) ---
+tabulate>=0.9
+
 # --- App & tests ---
 streamlit>=1.33
 pytest>=8.0

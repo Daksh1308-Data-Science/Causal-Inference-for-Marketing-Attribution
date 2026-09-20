@@ -43,6 +43,7 @@ REQUIRED_PACKAGES = [
     "nbformat",
     "nbclient",
     "ipykernel",
+    "tabulate",
     "streamlit",
 ]
 

@@ -17,7 +17,7 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 | 1 | Env + data | Restore pinned reqs into `.venv`; extended env gate (dowhy0.8 classic API, causalml, econml, streamlit, pymysql); verify MySQL80 + credentials in `.env`; create `olist` DB + `olist_app` user; download Olist CSVs → `data/raw/` | Working env + raw data in MySQL | Imports pass; live DB connection; row counts vs Olist docs | `Day 1: env gate + MySQL ingestion` | ✅ |
 | 2 | Data engineering | `schema.sql`, `load.sql`; bulk-load 9 tables; `customer_analytical` view → RFM / tenure / category / state / seasonality; processed parquet | Analytical dataset | Schema tests pass; no dupes; RFM plausible | `Day 2: customer analytical dataset` | ✅ |
 | 3 | EDA | Missingness, outliers, distributions, cohorts, retention, RFM segmentation; channel descriptive stats (sim preview) | `notebooks/01_eda` + figures | Distributions sane; ~96k customers / ~100k orders | `Day 3: EDA + cohorts` | ✅ |
-| 4 | Confounders | Classify every variable: confounder / treatment / outcome / mediator / collider / irrelevant, with rationale | Confounder audit table | Each row causally justified | `Day 4: confounder audit` | ⬜ |
+| 4 | Confounders | Classify every variable: confounder / treatment / outcome / mediator / collider / irrelevant, with rationale | Confounder audit table | Each row causally justified | `Day 4: confounder audit` | ✅ |
 | 5 | DAG | DoWhy `CausalModel`; backdoor paths; adjustment set; render (networkx + plotly) | `reports/dag` + graphic | Adjustment set matches audit | `Day 5: causal DAG` | ⬜ |
 | 6 | Propensity | Logit PS per channel; overlap; PS distributions | `notebooks/02_propensity` | Overlap plot; no near-0/1 | `Day 6: propensity scores` | ⬜ |
 | 7 | Matching | PSM nearest-neighbor; SMD before/after; love plot; assumptions checklist | Balance report | SMD < 0.1 | `Day 7: PSM + balance` | ⬜ |
@@ -56,11 +56,13 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 
 ## Progress summary (updated after every day)
 
-- **Completed:** Day 0, Day 1, Day 2, Day 3
+- **Completed:** Day 0, Day 1, Day 2, Day 3, Day 4
 - **In progress:** —
-- **Next up:** Days 4–7 (confounder audit → DAG → propensity → matching) → **Gate 1** at end of Day 7
+- **Next up:** Days 5–7 (DAG → propensity → matching) → **Gate 1** at end of Day 7
 - **Blockers:** none
 
 > ✅ Day 2 validation hook green: 50/50 tests pass (25 env gate + 25 data schema/cohort/RFM), cohort = 94,983, no dupes, RFM plausible. See `docs/status.md`.
 
 > ✅ Day 3 validation hook green: distributions sane — 94,983-cohort from 98,199 purchased orders (raw ~96k customers / ~100k orders); 18 new EDA tests; full suite 71/71. See `docs/status.md`.
+
+> ✅ Day 4 validation hook green: 23 audit rows, 14 tests pass; per-channel identification strategy + adjustment sets locked; full suite 86/86. See `docs/status.md`.

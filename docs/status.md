@@ -2,14 +2,14 @@
 
 Updated at the end of every day. Mirrors `docs/roadmap.md`.
 
-Last updated: **Day 3 — complete** (2026-09-20)
+Last updated: **Day 4 — complete** (2026-09-20)
 
 ## Current state
 
 | Phase | Status |
 |---|---|
 | Governance docs | ✅ Done (Day 0) |
-| Week 1 — Data + Causal framework (Days 1–7) | 🟡 Day 3 complete; Days 4–7 next |
+| Week 1 — Data + Causal framework (Days 1–7) | 🟡 Day 4 complete; Days 5–7 next |
 | Week 2 — Treatment effect estimation (Days 8–14) | ⬜ Not started |
 | Week 3 — Business + robustness + product (Days 15–21) | ⬜ Not started |
 
@@ -64,6 +64,15 @@ Last updated: **Day 3 — complete** (2026-09-20)
 - [x] `tests/test_eda.py` — **18 tests pass** (cohort scale, distribution sane-ness, missingness contract, retention structure, RFM partition, sim_* prefix contract, determinism, ground-truth match vs config, figures written)
 - [x] Docs: ADR-009…012, `docs/data-feasibility.md` §4.1 (Day-3 preview variables documented per AGENTS §2), roadmap Day 3 ✅, repurchase-rate note updated to observed 97% one-time
 - [x] **Full suite: 71/71 tests pass** (28 env gate + 25 data schema + 18 EDA). **Day 3 validation hook green.**
+
+### Day 4 — Confounder audit ✅
+- [x] `src/causal/confounders.py` — audit module classifying every candidate variable per Plan.md Step 4 (Confounder / Treatment / Outcome / Mediator / Collider / Irrelevant) with rationale, adjust decision, and `active_in_preview` flag
+- [x] Identification strategy (AGENTS.md §3) written **before fitting**: per-channel causal question, treatment, outcomes, sufficient observed adjustment set derived from config targeting coefs, assumptions checklist (exchangeability, positivity, consistency, SUTVA) with evidence + limitation
+- [x] `results/tables/confounder_audit.csv` — 23 rows, machine-readable
+- [x] `reports/confounder_audit.md` — narrative report with identification strategy, assumptions checklist, and full audit table
+- [x] Adjustment sets locked per channel: email {order_count, recency_days, review_score_avg, total_revenue}, social {order_count, tenure_days, total_revenue}, search {order_count, tenure_days, total_revenue}, display {recency_days, total_revenue}; sim_u explicitly EXCLUDED (unobserved-confounder source; sensitivity only)
+- [x] `tests/test_confounder_audit.py` — 14 tests: every row has rationale, roles/adjust valid, treatments/outcomes present, adjustment sets match config, sim_u/confounders/mediators/colliders/ground-truth classified correctly
+- [x] **Full suite: 86/86 tests pass** (28 env gate + 25 data schema + 18 EDA + 14 confounder audit). **Day 4 validation hook green.**
 
 ## Blockers
 

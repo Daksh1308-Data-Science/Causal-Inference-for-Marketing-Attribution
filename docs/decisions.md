@@ -81,3 +81,14 @@ Status: **Accepted** unless noted. When a decision changes, add a new ADR overri
 - **Context:** The roadmap's Day-3 EDA includes "channel descriptive stats (sim preview)", and Days 6-7 (propensity, matching) already need `sim_*` exposure inputs.
 - **Decision:** `simulation/simulate_marketing.py` implements the Day-3 *preview*: a single campaign snapshot (no per-campaign date grid yet) with logistic targeting per channel, latent `sim_u` confounding by design, embedded `sim_ground_truth_*` effects from config, and a 14-day conversion + lognormal revenue outcome. All columns `sim_*`-prefixed; naive conversions reported as *descriptive, not causal*. The full campaign-date grid lands in Week 2 when the analysis dataset is finalized.
 - **Consequences:** Day-6/7 estimators can already run against `data/simulated/sim_preview.parquet`; results are clearly labeled as simulation-preview outputs in `notebooks/01_eda` §8.
+
+## ADR-013 — Confounder audit scope: active-in-preview vs intended-full-sim
+
+- **Date:** 2026-09-20 · **Status:** Accepted
+- **Context:** Day-4 requires classifying every variable (confounder/treatment/outcome/mediator/collider/irrelevant) with rationale. The Day-3 preview DGP only activates a subset of the intended confounders (recency_days, order_count, total_revenue, tenure_days, review_score_avg + sim_u). The full Week-2 simulation will add category_affinity_top, state, seasonality, and click/session mediators.
+- **Decision:** The audit table classifies variables by their *intended causal role per the simulation design*, with an `active_in_preview` boolean flag. Variables not yet wired in the preview DGP (category, state, seasonality, click/session, co-exposure collider) are marked `active_in_preview=False` and their balance checks serve as placebos until Week 2. The `adjustment_sets()` function derives the *active* observed confounders mechanically from `config.yaml` targeting coefs so Days 5-7 estimators use the exact adjustment set that matches the preview DGP, not the intended one.
+- **Consequences:**
+  - Honest classification: no variable is claimed to confound the preview when it doesn't.
+  - `reports/confounder_audit.md` includes the full identification strategy (AGENTS.md §3) written before fitting, per channel.
+  - `adjustment_sets()` is the single source of truth for Day-5 DAG and Day-6/7 estimators.
+  - Category/state/seasonality are confounders by design — estimators must include them once the full sim activates them.
