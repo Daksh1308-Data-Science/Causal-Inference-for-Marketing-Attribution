@@ -129,3 +129,23 @@ Status: **Accepted** unless noted. When a decision changes, add a new ADR overri
   - Social/search/display ESS 70-92% — acceptable for IPW.
   - SMD before matching shows meaningful imbalance (|SMD| > 0.1 for several confounders), justifying matching (Day 7).
   - Adjustment sets mechanically match Day-4/5 audit.
+
+## ADR-016 — Nearest-neighbor PSM with caliper + balance diagnostics
+
+- **Date:** 2026-09-20 · **Status:** Accepted
+- **Context:** Day-7 requires propensity score matching with covariate balance (SMD < 0.1). Must use Day-4/5 adjustment sets and Day-6 PS estimates.
+- **Decision:**
+  - `src/causal/matching.py` implements 1:1 nearest-neighbor matching on PS with caliper = 0.01 × SD(PS), without replacement.
+  - SMD computed before and after matching for all confounders in the adjustment set.
+  - Love plots (`smd_love_{channel}.html`) show grouped before/after bars with ±0.1 threshold.
+  - PS after matching distributions (`ps_after_{channel}.html`) confirm overlap on matched sample.
+  - Assumptions checklist per channel (6 rows: exchangeability, positivity, consistency, SUTVA, PS spec, matching quality).
+- **Consequences:**
+  - All 4 channels achieve balance: max |SMD| after matching < 0.01 (well below 0.1 threshold).
+  - Match rates 98.7–99.5% — minimal treated units lost.
+  - Email channel's PS=1.0 clumping (71 units) did not prevent matching; caliper handled it.
+  - All covariates improved: order_count, recency_days, tenure_days, total_revenue, review_score_avg.
+  - Matching quality "Met" for social/search/display; "Marginal" for email due to PS clumping.
+  - Positivity assumption: Met for 3 channels; Marginal for email (perfect prediction subgroup).
+  - Exchangeability: Partially met (observed confounders balanced; residual `sim_u` confounding by design).
+  - Ready for treatment effect estimation on matched samples (Week 2).

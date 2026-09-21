@@ -20,7 +20,7 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 | 4 | Confounders | Classify every variable: confounder / treatment / outcome / mediator / collider / irrelevant, with rationale | Confounder audit table | Each row causally justified | `Day 4: confounder audit` | ✅ |
 | 5 | DAG | DoWhy `CausalModel`; backdoor paths; adjustment set; render (networkx + plotly) | `reports/dag` + graphic | Adjustment set matches audit | `Day 5: causal DAG` | ✅ |
 | 6 | Propensity | Logit PS per channel; overlap; PS distributions | `notebooks/02_propensity` | Overlap plot; no near-0/1 | `Day 6: propensity scores` | ✅ |
-| 7 | Matching | PSM nearest-neighbor; SMD before/after; love plot; assumptions checklist | Balance report | SMD < 0.1 | `Day 7: PSM + balance` | ⬜ |
+| 7 | Matching | PSM nearest-neighbor; SMD before/after; love plot; assumptions checklist | Balance report | SMD < 0.1 | `Day 7: PSM + balance` | ✅ |
 
 **🏁 Gate 1 — STOP after Day 7 and get human validation before Week 2.**
 
@@ -56,9 +56,9 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 
 ## Progress summary (updated after every day)
 
-- **Completed:** Day 0, Day 1, Day 2, Day 3, Day 4, Day 5, Day 6
+- **Completed:** Day 0, Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7
 - **In progress:** —
-- **Next up:** Day 7 (matching) → **Gate 1** at end of Day 7
+- **Next up:** **Gate 1** — human validation before Week 2
 - **Blockers:** none
 
 > ✅ Day 2 validation hook green: 50/50 tests pass (25 env gate + 25 data schema/cohort/RFM), cohort = 94,983, no dupes, RFM plausible. See `docs/status.md`.
@@ -70,3 +70,5 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 > ✅ Day 5 validation hook green: 4 per-channel DAGs rendered (HTML), 9 tests pass; adjustment sets match audit; full suite 95/95. See `docs/status.md`.
 
 > ✅ Day 6 validation hook green: 4 channels PS estimated, 13 tests pass; overlap plots + SMD before matching; ESS reported; full suite 108/108. See `docs/status.md`.
+
+> ✅ Day 7 validation hook green: 4 channels matched, 11 tests pass; all covariates |SMD| < 0.1 after matching; match rates 98.7–99.5%; full suite 119/119. See `docs/status.md`.

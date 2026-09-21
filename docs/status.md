@@ -2,14 +2,14 @@
 
 Updated at the end of every day. Mirrors `docs/roadmap.md`.
 
-Last updated: **Day 6 — complete** (2026-09-20)
+Last updated: **Day 7 — complete** (2026-09-20)
 
 ## Current state
 
 | Phase | Status |
 |---|---|
 | Governance docs | ✅ Done (Day 0) |
-| Week 1 — Data + Causal framework (Days 1–7) | 🟡 Day 6 complete; Day 7 next |
+| Week 1 — Data + Causal framework (Days 1–7) | ✅ Complete (Gate 1 ready) |
 | Week 2 — Treatment effect estimation (Days 8–14) | ⬜ Not started |
 | Week 3 — Business + robustness + product (Days 15–21) | ⬜ Not started |
 
@@ -94,11 +94,23 @@ Last updated: **Day 6 — complete** (2026-09-20)
 - [x] `tests/test_propensity.py` — 13 tests: PS estimated, overlap exists, no near-0 PS, ESS reported, adjustment sets match audit, SMD computed
 - [x] **Full suite: 108/108 tests pass** (28 env gate + 25 data schema + 18 EDA + 14 confounder audit + 9 DAG + 13 propensity). **Day 6 validation hook green.**
 
+### Day 7 — PSM + Balance ✅
+- [x] `src/causal/matching.py` — nearest-neighbor PSM (1:1) with caliper (0.01 * SD(PS)), without replacement
+- [x] Balance diagnostics: SMD love plots (before vs after), PS after matching distributions
+- [x] `results/figures/smd_love_{channel}.html` — grouped bar charts with ±0.1 threshold
+- [x] `results/figures/ps_after_{channel}.html` — violin plots on matched sample
+- [x] Key findings: all 4 channels PASS balance (max |SMD| after < 0.01); match rates 98.7–99.5%
+- [x] Email: 28,118 pairs (99.1%); Social: 24,382 (98.7%); Search: 31,349 (99.0%); Display: 35,285 (99.5%)
+- [x] All covariates improved: order_count, recency_days, review_score_avg, total_revenue, tenure_days all |SMD| < 0.01
+- [x] Assumptions checklist per channel (exchangeability, positivity, consistency, SUTVA, PS spec, matching quality)
+- [x] `tests/test_matching.py` — 11 tests: matching runs, SMD balanced, match rates high, caliper respected, checklists generated
+- [x] **Full suite: 119/119 tests pass** (28 env + 25 schema + 18 EDA + 14 confounders + 9 DAG + 13 PS + 11 matching). **Day 7 validation hook green.**
+
 ## Blockers
 
 None.
 
 ## Next actions
 
-1. **Day 7:** PSM nearest-neighbor + covariate balance (SMD < 0.1) + assumptions checklist.
-2. **Gate 1** — STOP after Day 7 and get human validation before Week 2.
+1. **Gate 1** — STOP and get human validation before Week 2 (Days 8–14: treatment effect estimation).
+2. Week 2: naive estimates → OLS → IPW → DR → ATE/ATT synthesis → CATE → uplift → Gate 2.
