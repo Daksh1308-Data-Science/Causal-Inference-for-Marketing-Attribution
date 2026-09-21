@@ -2,7 +2,7 @@
 
 Updated at the end of every day. Mirrors `docs/roadmap.md`.
 
-Last updated: **Day 8 — complete** (2026-09-21)
+Last updated: **Day 9 — complete** (2026-09-21)
 
 ## Current state
 
@@ -10,7 +10,7 @@ Last updated: **Day 8 — complete** (2026-09-21)
 |---|---|
 | Governance docs | ✅ Done (Day 0) |
 | Week 1 — Data + Causal framework (Days 1–7) | ✅ Complete (Gate 1 validated) |
-| Week 2 — Treatment effect estimation (Days 8–14) | 🟡 Day 8 complete; Days 9–14 next |
+| Week 2 — Treatment effect estimation (Days 8–14) | 🟡 Day 9 complete; Days 10–14 next |
 | Week 3 — Business + robustness + product (Days 15–21) | ⬜ Not started |
 
 ## Completed
@@ -119,12 +119,25 @@ Last updated: **Day 8 — complete** (2026-09-21)
 - [x] `tests/test_naive.py` — 12 tests: rows present, diff = mean diff exactly, SE/CI valid, direction documented, confounding signatures, report labeled "observed (simulated)", determinism
 - [x] **Full suite: 131/131 tests pass** (119 + 12 naive). **Day 8 validation hook green.**
 
+### Day 9 — Regression Adjustment (OLS) ✅
+- [x] `src/causal/regression.py` — OLS per channel × outcome on exposure + Day-4 adjustment set, HC3 robust SEs, 95% CI (LPM for conversion; OLS for revenue)
+- [x] `results/tables/ols_estimates.csv` — 8 rows merged with naive gap + simulated ground truth
+- [x] `results/figures/ols_conversion.html`, `ols_revenue.html` — OLS vs naive grouped bars with CI error bars
+- [x] `reports/ols_estimates.md` — comparison table, naive contrast, limitations (linearity, LPM boundaries, no balance guarantee, residual `sim_u`)
+- [x] Key findings (estimated, simulated):
+  - OLS barely moves the gap vs naive (e.g., display conversion +11.17→+11.22 pp vs simulated GT 0.00; email revenue +R$16.77→+17.11 vs GT +0.12)
+  - Honest design point: the DGP is dominated by unobserved `sim_u` (U→outcome coef 1.0 vs observed features 0.05 each) — observed-confounder adjustment alone cannot remove the bias
+  - Social is the one channel visibly shrinking toward its negative GT (−0.08)
+  - CIs sane vs naive: SE ratios 0.5–2.0, all CI contain coef
+- [x] `tests/test_regression.py` — 11 tests: rows present, CI sane, SE ratio vs naive, adjustment set used, coef = statsmodels fit, HC3, honest movement, files written, simulated labeling, determinism
+- [x] **Full suite: 142/142 tests pass** (131 + 11 regression). **Day 9 validation hook green.**
+
 ## Blockers
 
 None.
 
 ## Next actions
 
-1. **Week 2 in progress (Gate 1 passed):** Day 9 regression adjustment (OLS) → Day 10 IPW → Day 11 doubly robust → Day 12 ATE/ATT synthesis → Days 13–14 CATE/uplift.
+1. **Week 2 in progress (Gate 1 passed):** Day 10 IPW (stabilized weights, ESS, extreme-weight handling) → Day 11 doubly robust → Day 12 ATE/ATT synthesis → Days 13–14 CATE/uplift.
 2. **Gate 2** after Day 14 — human validation before Week 3.
-3. Note: naive gaps (Day 8) are expected to shrink toward their simulated ground truths once adjustment is applied (Days 9–12).
+3. Day-9 takeaway feeds Day 12 & 18: observed-confounder adjustment barely moves the gap — unobserved `sim_u` must be quantified via sensitivity analysis.

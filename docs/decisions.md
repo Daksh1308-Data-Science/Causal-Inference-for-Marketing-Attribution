@@ -165,3 +165,17 @@ Status: **Accepted** unless noted. When a decision changes, add a new ADR overri
   - Social: ground truth −0.08 but naive +11.3 pp → selection bias outweighs a genuinely negative effect ("sleeping dogs" narrative).
   - Establishes the benchmark that adjustment (Days 9–12) must shrink toward the simulated ground truths.
   - Full suite 131/131; Day 8 validation hook ("direction documented") green.
+
+## ADR-018 — OLS regression adjustment with HC3 robust SEs (Day 9)
+
+- **Date:** 2026-09-21 · **Status:** Accepted
+- **Context:** Day-9 requires a regression-adjusted treatment coefficient per channel with CIs and explicit limitations. Adjustment set is fixed from Day-4/5. The DGP is dominated by unobserved `sim_u`, so OLS is expected to move little vs the Day-8 naive gap.
+- **Decision:**
+  - `src/causal/regression.py` fits OLS of outcome on exposure + adjustment set per channel × outcome. Conversion = linear probability model (risk difference); revenue = OLS (R$). Inference with HC3 heteroskedasticity-robust SEs.
+  - Outputs: `results/tables/ols_estimates.csv`, `results/figures/ols_{conversion,revenue}.html`, `reports/ols_estimates.md` (limitations section: linearity, LPM boundaries, no balance guarantee, residual `sim_u`).
+- **Consequences:**
+  - OLS barely moves vs naive (display conversion +11.17→+11.22 pp vs GT 0.00; email revenue +R$16.77→+17.11 vs GT +0.12) — consistent with sim_u dominating (U→outcome coef 1.0 vs observed features 0.05 each in the DGP).
+  - Social shrinks most toward its negative GT (conversion 0.1127→0.1061); directionally honest.
+  - CI sanity vs naive validated at SE ratio 0.5–2.0; R² low (0.009–0.024), as expected for a noisy binary/lognormal outcome.
+  - Confirms the Day-18 sensitivity need: quantify how strong unobserved U must be to explain the remaining gap.
+  - Full suite 142/142; Day 9 validation hook ("CIs sane vs naive") green.
