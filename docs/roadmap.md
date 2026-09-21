@@ -30,7 +30,7 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 |-----|-------|----------------------|-------------|------------|--------|:------:|
 | 8 | Naive estimates | Diff-in-means per channel + "why not causal" write-up | Results: naive table | Direction documented | `Day 8: naive estimates` | ✅ |
 | 9 | Regression adjustment | OLS treatment coeff, CIs, spec, limitations | Results: OLS table | CIs sane vs naive | `Day 9: regression adjustment` | ✅ |
-| 10 | IPW | Stabilized weights, ESS, extreme-weight handling | Results: IPW table | ESS reported; weights bounded | `Day 10: inverse probability weighting` | ⬜ |
+| 10 | IPW | Stabilized weights, ESS, extreme-weight handling | Results: IPW table | ESS reported; weights bounded | `Day 10: inverse probability weighting` | ✅ |
 | 11 | Doubly robust | AIPW (causalml / manual); double-robustness explanation | Results: DR table | Consistent vs OLS/IPW | `Day 11: doubly robust` | ⬜ |
 | 12 | ATE/ATT | Master estimate table (point/CI/SE/N/estimator/assumptions); DoWhy backdoor cross-check | `reports/treatment_effects` | Estimator convergence story | `Day 12: ATE/ATT synthesis` | ⬜ |
 | 13 | CATE | T/S/X-learners (causalml); compare | `notebooks/03_cate` | Learner agreement map | `Day 13: heterogeneous effects` | ⬜ |
@@ -56,9 +56,9 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 
 ## Progress summary (updated after every day)
 
-- **Completed:** Day 0, Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7, Day 8, Day 9
+- **Completed:** Day 0, Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7, Day 8, Day 9, Day 10
 - **In progress:** —
-- **Next up:** Day 10 (IPW) → Gate 2 after Day 14
+- **Next up:** Day 11 (doubly robust) → Gate 2 after Day 14
 - **Blockers:** none
 
 > ✅ Day 2 validation hook green: 50/50 tests pass (25 env gate + 25 data schema/cohort/RFM), cohort = 94,983, no dupes, RFM plausible. See `docs/status.md`.
@@ -76,3 +76,5 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 > ✅ Day 8 validation hook green: naive diff-in-means for 4 channels × 2 outcomes, 12 tests pass; direction documented (all positive, selection-dominated); display/social show confounding signature (naive gap large while simulated ground truth 0/−0.08); full suite 131/131. See `docs/status.md`.
 
 > ✅ Day 9 validation hook green: OLS per channel × outcome (HC3 robust SE, 95% CI), 11 tests pass; CIs sane vs naive (SE ratio 0.5–2.0); honest finding — observed-confounder adjustment barely moves the gap because latent `sim_u` dominates confounding (by design); full suite 142/142. See `docs/status.md`.
+
+> ✅ Day 10 validation hook green: stabilized IPW per channel × outcome, 12 tests pass; ESS reported (raw + after Cole–Hernán truncation, weights bounded at cap 10); email ESS recovered 2.4 → 86,328; bootstrap CI; IPW ≈ OLS ≈ naive (sim_u dominates); full suite 154/154. See `docs/status.md`.

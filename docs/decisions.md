@@ -179,3 +179,18 @@ Status: **Accepted** unless noted. When a decision changes, add a new ADR overri
   - CI sanity vs naive validated at SE ratio 0.5–2.0; R² low (0.009–0.024), as expected for a noisy binary/lognormal outcome.
   - Confirms the Day-18 sensitivity need: quantify how strong unobserved U must be to explain the remaining gap.
   - Full suite 142/142; Day 9 validation hook ("CIs sane vs naive") green.
+
+## ADR-019 — Stabilized IPW with Cole–Hernán truncation (Day 10)
+
+- **Date:** 2026-09-21 · **Status:** Accepted
+- **Context:** Day-10 requires a propensity-weighted ATE with ESS reporting and extreme-weight handling. Day-6 flagged email's weak overlap (71 units PS ≈ 1.0) which renders naive unstabilized IPW near-useless (ESS ≈ 3).
+- **Decision:**
+  - `src/causal/ipw.py` uses Hajek-normalized STABILIZED weights `w = T·P(T=1)/p + (1−T)·P(T=0)/(1−p)`; truncation at `ipw.weight_cap = 10` (Cole & Hernán) with truncation count reported; ESS = (Σw)²/Σw² computed before and after truncation.
+  - CIs from bootstrap (fix `ipw.bootstrap_reps = 500`, seed = config seed + channel index).
+  - Tunables in `configs/config.yaml` under `ipw:` (no magic values).
+- **Consequences:**
+  - Email raw stabilized ESS = 2.4 (worse than unstabilized 3.2, as stabilized weights concentrate) → post-truncation ESS **86,328 (90.9% of n)**; only 13 units capped at 10.
+  - All channels: weights bounded at cap; ESS 90.9–98.5% of n after truncation.
+  - IPW ATE ≈ OLS ≈ naive (email conv 0.1287 vs 0.1274 vs 0.1252) — reweighting on observed confounders cannot remove `sim_u` selection; consistent with Day-9 finding.
+  - Bootstrap CI captures design variability, not PS/model misspecification — stated as a limitation.
+  - Full suite 154/154; Day 10 validation hook ("ESS reported; weights bounded") green.

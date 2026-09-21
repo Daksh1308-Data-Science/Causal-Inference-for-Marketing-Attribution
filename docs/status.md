@@ -2,7 +2,7 @@
 
 Updated at the end of every day. Mirrors `docs/roadmap.md`.
 
-Last updated: **Day 9 — complete** (2026-09-21)
+Last updated: **Day 10 — complete** (2026-09-21)
 
 ## Current state
 
@@ -10,7 +10,7 @@ Last updated: **Day 9 — complete** (2026-09-21)
 |---|---|
 | Governance docs | ✅ Done (Day 0) |
 | Week 1 — Data + Causal framework (Days 1–7) | ✅ Complete (Gate 1 validated) |
-| Week 2 — Treatment effect estimation (Days 8–14) | 🟡 Day 9 complete; Days 10–14 next |
+| Week 2 — Treatment effect estimation (Days 8–14) | 🟡 Day 10 complete; Days 11–14 next |
 | Week 3 — Business + robustness + product (Days 15–21) | ⬜ Not started |
 
 ## Completed
@@ -132,12 +132,23 @@ Last updated: **Day 9 — complete** (2026-09-21)
 - [x] `tests/test_regression.py` — 11 tests: rows present, CI sane, SE ratio vs naive, adjustment set used, coef = statsmodels fit, HC3, honest movement, files written, simulated labeling, determinism
 - [x] **Full suite: 142/142 tests pass** (131 + 11 regression). **Day 9 validation hook green.**
 
+### Day 10 — IPW ✅
+- [x] `configs/config.yaml`: `ipw:` block (weight_cap 10.0, bootstrap_reps 500, alpha 0.05) — no hardcoded magic values
+- [x] `src/causal/ipw.py` — stabilized (Hajek) IPW per channel × outcome; Cole–Hernán weight truncation; ESS before/after; bootstrap CI (fixed seed)
+- [x] `results/tables/ipw_estimates.csv`, `results/figures/ipw_{conversion,revenue}.html`, `reports/ipw_estimates.md` (identification statement before fitting, weight diagnostics, limitations)
+- [x] Key findings (estimated, simulated):
+  - IPW ATE ≈ OLS ≈ naive (e.g., email conv 0.1287 vs OLS 0.1274 vs naive 0.1252) — `sim_u` dominates; IPW reweighting on observed PS cannot remove it
+  - Email weak overlap: raw stabilized ESS 2.4 → **86,328 after truncation** (90.9% of n); 13 units capped at weight 10
+  - All channels: weights bounded at cap 10.0; ESS 90.9–98.5% of n post-truncation
+- [x] `tests/test_ipw.py` — 12 tests: weights bounded, ESS reported + improves, email ESS recovery, bootstrap CI, stabilized-weight formula, IPW≈OLS consistency, determinism
+- [x] **Full suite: 154/154 tests pass** (142 + 12 IPW). **Day 10 validation hook green.**
+
 ## Blockers
 
 None.
 
 ## Next actions
 
-1. **Week 2 in progress (Gate 1 passed):** Day 10 IPW (stabilized weights, ESS, extreme-weight handling) → Day 11 doubly robust → Day 12 ATE/ATT synthesis → Days 13–14 CATE/uplift.
+1. **Week 2 in progress (Gate 1 passed):** Day 11 doubly robust (AIPW) → Day 12 ATE/ATT synthesis → Days 13–14 CATE/uplift.
 2. **Gate 2** after Day 14 — human validation before Week 3.
-3. Day-9 takeaway feeds Day 12 & 18: observed-confounder adjustment barely moves the gap — unobserved `sim_u` must be quantified via sensitivity analysis.
+3. Emerging storyline (Days 8–10): naive ≈ OLS ≈ IPW because `sim_u` dominates — Day 12 synthesis frames this honestly; Day 18 quantifies the unobserved confounder.

@@ -21,6 +21,12 @@ seed: 42
 # --- Causal analysis window ---
 outcome_window_days: 14
 
+# --- IPW (Day 10) tunables ---
+ipw:
+  weight_cap: 10.0        # truncate stabilized weights above this multiple (Cole & Hernan)
+  bootstrap_reps: 500     # resamples for bootstrap CI (fixed seed from `seed`)
+  alpha: 0.05             # CI level
+
 # --- Simulated marketing layer (design: docs/data-feasibility.md §4) ---
 # Day 3 ships a clearly-labeled PREVIEW of the layer so channel descriptive
 # stats can be shown; the full campaign-date structure lands in Week 2.
