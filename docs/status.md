@@ -2,15 +2,15 @@
 
 Updated at the end of every day. Mirrors `docs/roadmap.md`.
 
-Last updated: **Day 7 — complete** (2026-09-20)
+Last updated: **Day 8 — complete** (2026-09-21)
 
 ## Current state
 
 | Phase | Status |
 |---|---|
 | Governance docs | ✅ Done (Day 0) |
-| Week 1 — Data + Causal framework (Days 1–7) | ✅ Complete (Gate 1 ready) |
-| Week 2 — Treatment effect estimation (Days 8–14) | ⬜ Not started |
+| Week 1 — Data + Causal framework (Days 1–7) | ✅ Complete (Gate 1 validated) |
+| Week 2 — Treatment effect estimation (Days 8–14) | 🟡 Day 8 complete; Days 9–14 next |
 | Week 3 — Business + robustness + product (Days 15–21) | ⬜ Not started |
 
 ## Completed
@@ -106,11 +106,25 @@ Last updated: **Day 7 — complete** (2026-09-20)
 - [x] `tests/test_matching.py` — 11 tests: matching runs, SMD balanced, match rates high, caliper respected, checklists generated
 - [x] **Full suite: 119/119 tests pass** (28 env + 25 schema + 18 EDA + 14 confounders + 9 DAG + 13 PS + 11 matching). **Day 7 validation hook green.**
 
+### Day 8 — Naive Estimates ✅
+- [x] `src/causal/naive.py` — unadjusted diff-in-means per channel × outcome (conversion: two-proportion Wald; revenue: Welch t) with SE + 95% CI
+- [x] `results/tables/naive_estimates.csv` — 8 rows (4 channels × 2 outcomes) + simulated ground-truth column
+- [x] `results/figures/naive_conversion.html`, `naive_revenue.html` — bar charts with CI error bars
+- [x] `reports/naive_estimates.md` — "why not causal" write-up per channel (confounded targeting + latent `sim_u`; naive gap = causal effect + selection)
+- [x] Key findings (observed, simulated):
+  - All 4 channels show positive naive gaps: conversion +11.2 to +12.8 pp; revenue +R$15.96 to +17.96
+  - **Display confounding signature**: ground truth = 0.00, naive gap +11.2 pp → apparent effect is pure selection
+  - **Social**: ground truth −0.08 (negative), naive gap +11.3 pp → selection overwhelms the true negative effect
+  - Email: naive +12.5 pp vs GT +0.12; Search: naive +12.8 pp vs GT +0.15 — inflated by confounding
+- [x] `tests/test_naive.py` — 12 tests: rows present, diff = mean diff exactly, SE/CI valid, direction documented, confounding signatures, report labeled "observed (simulated)", determinism
+- [x] **Full suite: 131/131 tests pass** (119 + 12 naive). **Day 8 validation hook green.**
+
 ## Blockers
 
 None.
 
 ## Next actions
 
-1. **Gate 1** — STOP and get human validation before Week 2 (Days 8–14: treatment effect estimation).
-2. Week 2: naive estimates → OLS → IPW → DR → ATE/ATT synthesis → CATE → uplift → Gate 2.
+1. **Week 2 in progress (Gate 1 passed):** Day 9 regression adjustment (OLS) → Day 10 IPW → Day 11 doubly robust → Day 12 ATE/ATT synthesis → Days 13–14 CATE/uplift.
+2. **Gate 2** after Day 14 — human validation before Week 3.
+3. Note: naive gaps (Day 8) are expected to shrink toward their simulated ground truths once adjustment is applied (Days 9–12).

@@ -28,7 +28,7 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 
 | Day | Focus | Tasks (Python / SQL) | Deliverable | Validation | Commit | Status |
 |-----|-------|----------------------|-------------|------------|--------|:------:|
-| 8 | Naive estimates | Diff-in-means per channel + "why not causal" write-up | Results: naive table | Direction documented | `Day 8: naive estimates` | ⬜ |
+| 8 | Naive estimates | Diff-in-means per channel + "why not causal" write-up | Results: naive table | Direction documented | `Day 8: naive estimates` | ✅ |
 | 9 | Regression adjustment | OLS treatment coeff, CIs, spec, limitations | Results: OLS table | CIs sane vs naive | `Day 9: regression adjustment` | ⬜ |
 | 10 | IPW | Stabilized weights, ESS, extreme-weight handling | Results: IPW table | ESS reported; weights bounded | `Day 10: inverse probability weighting` | ⬜ |
 | 11 | Doubly robust | AIPW (causalml / manual); double-robustness explanation | Results: DR table | Consistent vs OLS/IPW | `Day 11: doubly robust` | ⬜ |
@@ -56,9 +56,9 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 
 ## Progress summary (updated after every day)
 
-- **Completed:** Day 0, Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7
+- **Completed:** Day 0, Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7, Day 8
 - **In progress:** —
-- **Next up:** **Gate 1** — human validation before Week 2
+- **Next up:** Day 9 (regression adjustment) → Gate 2 after Day 14
 - **Blockers:** none
 
 > ✅ Day 2 validation hook green: 50/50 tests pass (25 env gate + 25 data schema/cohort/RFM), cohort = 94,983, no dupes, RFM plausible. See `docs/status.md`.
@@ -72,3 +72,5 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 > ✅ Day 6 validation hook green: 4 channels PS estimated, 13 tests pass; overlap plots + SMD before matching; ESS reported; full suite 108/108. See `docs/status.md`.
 
 > ✅ Day 7 validation hook green: 4 channels matched, 11 tests pass; all covariates |SMD| < 0.1 after matching; match rates 98.7–99.5%; full suite 119/119. See `docs/status.md`.
+
+> ✅ Day 8 validation hook green: naive diff-in-means for 4 channels × 2 outcomes, 12 tests pass; direction documented (all positive, selection-dominated); display/social show confounding signature (naive gap large while simulated ground truth 0/−0.08); full suite 131/131. See `docs/status.md`.

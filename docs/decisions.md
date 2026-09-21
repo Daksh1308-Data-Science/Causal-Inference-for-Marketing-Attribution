@@ -149,3 +149,19 @@ Status: **Accepted** unless noted. When a decision changes, add a new ADR overri
   - Positivity assumption: Met for 3 channels; Marginal for email (perfect prediction subgroup).
   - Exchangeability: Partially met (observed confounders balanced; residual `sim_u` confounding by design).
   - Ready for treatment effect estimation on matched samples (Week 2).
+
+## ADR-017 — Naive diff-in-means baseline (Day 8, Week 2 kickoff)
+
+- **Date:** 2026-09-21 · **Status:** Accepted
+- **Context:** Week 2 starts with a naive, unadjusted comparison per channel so the causal estimators (Days 9–12) can be benchmarked against it. The naive gap is expected to be selection-dominated because assignment is confounded by design.
+- **Decision:**
+  - `src/causal/naive.py` computes diff-in-means (exposed − unexposed) for both simulated outcomes: 14-day conversion (risk difference, two-proportion Wald CI) and 14-day revenue (Welch t CI).
+  - Each row carries the SIMULATED ground-truth log-odds from config for the narrative — never presented as observed fact (AGENTS.md §2).
+  - Report `reports/naive_estimates.md` includes a per-channel "why not causal" section naming the confounders and `sim_u`.
+  - Outputs: `results/tables/naive_estimates.csv`, `results/figures/naive_{conversion,revenue}.html`.
+- **Consequences:**
+  - All channels show a large positive naive gap (conversion +11.2 to +12.8 pp; revenue +R$15.96–17.96).
+  - Display: ground truth 0.00 but naive +11.2 pp → textbook confounding signature, used as the validation story.
+  - Social: ground truth −0.08 but naive +11.3 pp → selection bias outweighs a genuinely negative effect ("sleeping dogs" narrative).
+  - Establishes the benchmark that adjustment (Days 9–12) must shrink toward the simulated ground truths.
+  - Full suite 131/131; Day 8 validation hook ("direction documented") green.
