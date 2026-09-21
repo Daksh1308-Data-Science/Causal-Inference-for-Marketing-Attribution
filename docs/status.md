@@ -2,7 +2,7 @@
 
 Updated at the end of every day. Mirrors `docs/roadmap.md`.
 
-Last updated: **Day 10 — complete** (2026-09-21)
+Last updated: **Day 11 — complete** (2026-09-21)
 
 ## Current state
 
@@ -10,7 +10,7 @@ Last updated: **Day 10 — complete** (2026-09-21)
 |---|---|
 | Governance docs | ✅ Done (Day 0) |
 | Week 1 — Data + Causal framework (Days 1–7) | ✅ Complete (Gate 1 validated) |
-| Week 2 — Treatment effect estimation (Days 8–14) | 🟡 Day 10 complete; Days 11–14 next |
+| Week 2 — Treatment effect estimation (Days 8–14) | 🟡 Day 11 complete; Days 12–14 next |
 | Week 3 — Business + robustness + product (Days 15–21) | ⬜ Not started |
 
 ## Completed
@@ -143,12 +143,24 @@ Last updated: **Day 10 — complete** (2026-09-21)
 - [x] `tests/test_ipw.py` — 12 tests: weights bounded, ESS reported + improves, email ESS recovery, bootstrap CI, stabilized-weight formula, IPW≈OLS consistency, determinism
 - [x] **Full suite: 154/154 tests pass** (142 + 12 IPW). **Day 10 validation hook green.**
 
+### Day 11 — Doubly Robust (AIPW) ✅
+- [x] `src/causal/doubly_robust.py` — manual AIPW (statsmodels outcome regressions + Day-6 PS), influence-function SE/CI (asymptotic root-n), per roadmap "AIPW (causalml / manual)" the manual route was chosen for transparency/reproducibility
+- [x] PS truncation reuses the Day-10 `weight_cap` principle: p clipped to `[P(T=1)/cap, 1-(1-P(T=1))/cap]` — prevents the `(1-T)(Y-μ0)/(1-p)` augmentation from exploding for the email weak-overlap units (13 controls with PS→1)
+- [x] `results/tables/dr_estimates.csv`, `results/figures/dr_{conversion,revenue}.html`, `reports/dr_estimates.md` (double-robustness explanation, AIPW table, consistency check, limitations)
+- [x] Key findings (estimated, simulated):
+  - DR ≈ IPW ≈ OLS ≈ naive exactly (e.g., email conv 0.12868 vs IPW 0.12868 vs OLS 0.12738) — as predicted, AIPW cannot outrun the design: `sim_u` is unadjusted so the estimate tracks OLS/IPW rather than the simulated ground truth
+  - SEs tigher than naive (e.g., email revenue SE 0.674 vs naive ~1.2), consistent with AIPW efficiency when both models hold
+  - Double-robustness property verified on a synthetic DGP (n=8,000): τ=1.0 recovered when the PS is correct but the outcome model is misspecified (1.33→with the double-expit test bug fixed), and vice versa
+  - Debugging note: an initial email DR explosion (1.0 vs 0.128) was traced to untruncated control-arm augmentation at PS→1, fixed by the Day-10-consistent PS clip; a test-only double-`expit` bug (Logit.predict already returns probabilities) corrupted the property-test PS and was fixed + documented
+- [x] `tests/test_doubly_robust.py` — 9 tests: rows present, consistent vs OLS/IPW (validation hook), IF SE/CI finite & ordered, email truncation reported (n_ps_truncated ≥ 13), no email explosion, **double-robustness property on synthetic DGP**, files written, report explains double robustness + sim_u, determinism
+- [x] **Full suite: 163/163 tests pass** (154 + 9 doubly robust). **Day 11 validation hook green.**
+
 ## Blockers
 
 None.
 
 ## Next actions
 
-1. **Week 2 in progress (Gate 1 passed):** Day 11 doubly robust (AIPW) → Day 12 ATE/ATT synthesis → Days 13–14 CATE/uplift.
+1. **Week 2 in progress (Gate 1 passed):** Day 12 ATE/ATT synthesis → Days 13–14 CATE/uplift.
 2. **Gate 2** after Day 14 — human validation before Week 3.
-3. Emerging storyline (Days 8–10): naive ≈ OLS ≈ IPW because `sim_u` dominates — Day 12 synthesis frames this honestly; Day 18 quantifies the unobserved confounder.
+3. Emerging storyline (Days 8–11): naive ≈ OLS ≈ IPW ≈ DR because `sim_u` dominates — Day 12 synthesis frames this honestly; Day 18 quantifies the unobserved confounder.
