@@ -1,0 +1,5 @@
+gate,scope,value,threshold,passed,detail
+qini_above_chance_gt,email/social/search (mean),1.1167,0.5,True,mean Uplift-strategy true lift over channels with a real embedded effect
+qini_display_no_effect,display,0.0,0.5,True,embedded effect 0.00 -> nothing to rank; true lift must be ~0 (bias would show)
+oracle_is_upper_bound,email/social/search,True,True,True,counterfactual oracle true lift is the max strategy per GT!=0 channel
+segments_interpretable,all channels (conversion),0.11,0.05,True,every 4-quadrant segment holds >= segment_min_share of its channel

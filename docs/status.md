@@ -2,7 +2,7 @@
 
 Updated at the end of every day. Mirrors `docs/roadmap.md`.
 
-Last updated: **Day 13 — complete** (2026-09-22)
+Last updated: **Day 14 — complete** (2026-09-22; awaiting Gate 2 validation)
 
 ## Current state
 
@@ -10,7 +10,7 @@ Last updated: **Day 13 — complete** (2026-09-22)
 |---|---|
 | Governance docs | ✅ Done (Day 0) |
 | Week 1 — Data + Causal framework (Days 1–7) | ✅ Complete (Gate 1 validated) |
-| Week 2 — Treatment effect estimation (Days 8–14) | 🟡 Day 13 complete; Day 14 (uplift) next → Gate 2 |
+| Week 2 — Treatment effect estimation (Days 8–14) | ✅ Day 14 complete → **awaiting Gate 2 human validation** |
 | Week 3 — Business + robustness + product (Days 15–21) | ⬜ Not started |
 
 ## Completed
@@ -177,12 +177,21 @@ Last updated: **Day 13 — complete** (2026-09-22)
 - [x] `tests/test_cate.py` — 11 tests: unit-level shape + no `sim_u`, summary shape/labels/CI, mean CATE ≈ Day-12 OLS ATE (both tolerances), **agreement hook all-OK + explicit tolerances**, individual agreement reported-not-gated, adjustment-set-only features, determinism (refit same channel identical; summary on loaded frame), artifacts written, report content, notebook deliverable
 - [x] **Full suite: 186/186 tests pass** (175 + 11 cate — includes the notebook deliverable check against built `03_cate.ipynb`). **Day 13 validation hook green.**
 
+### Day 14 — Uplift Modeling (Persuadables / Qini) ✅
+- [x] `configs/config.yaml`: `uplift:` block — `qini_grid_points` 10, `qini_true_lift_min_gt_pct` 0.5, `qini_true_lift_display_max_pct` 0.5 (calibrated to this DGP's ~27% oracle ceiling — a modest, honest bar), `scatter_sample` 5000, `segment_min_share` 0.05 + `results.uplift` output path
+- [x] `src/causal/uplift.py` — per channel × outcome × 4 strategies (**uplift** = Day-13 mean T/S/X CATE; **propensity** p(X) Day 6; **baseline** E[Y|X] Day 13; **oracle** = counterfactual true effect): manual **Radcliffe Qini** `qini_curve`/`qini_lift` (observed mode cross-checked against causalml `get_qini` — formula identical, max diff 0.0 on tie-free scores; mine breaks ties stably), median-quadrant **segments** (persuadable / sure thing / sleeping dog / lost cause), figures, report
+- [x] **Two-metric evaluation, both reported:** (1) *observed* Qini — real-world computable, `sim_u`-confounded; (2) *true* Qini — **counterfactual cumulative |true effect| gain** (simulation-only; chance = diagonal, Lorenz-style concentration). The true metric deliberately drops causalml's `×cumsum_tr` treatment weighting (which re-imports `sim_u` assignment selection into the score — propensity true-lift inflated to ~21% vs uplift ~2%) and uses |effect| so the negative channel (social) is evaluated like the positive ones (ranking by response magnitude)
+- [x] **Key finding — the observed Qini metric is `sim_u`-confounded:** email conversion observed lift: propensity 27.4% "wins", uplift 13.1%, and the **oracle sits below chance (−9.8%)** because it correctly demotes the high-`sim_u` conversion machines the assignment bias rewards. On the **true** metric the strategy order flips: oracle ≈ 26.7–27.9% (the achievable ceiling — the effect's intrinsic relative spread) while every observed-X model is ≈ 0–3% (uplift email 1.4 / social 0.3 / search 1.6, mean 1.1%). Real heterogeneity is essentially **unreachable on observed X**, and the plain baseline-response ranking (~3%) even beats the CATE ranking (~1%) — `sim_u` drives the effect. Display: 0.0 for every strategy (honest null; embedded effect 0.00)
+- [x] `results/uplift/{qini_curves,qini_summary,segment_summary,gates}.csv`, `results/figures/qini_curves_{conversion,revenue}.html` + `uplift_segments_conversion.html`, `reports/uplift_modeling.md`
+- [x] **Validation hooks — all 4 gates green:** `qini_above_chance_gt` (mean GT uplift true-lift 1.12% ≥ 0.5%), `qini_display_no_effect` (0.0 ≤ 0.5%), `oracle_is_upper_bound` (oracle true-lift is the max strategy per GT≠0 channel), `segments_interpretable` (every segment share ≥ 0.05, min 0.11; conv-rate/tau orderings structural)
+- [x] `tests/test_uplift.py` — 14 tests: frame schema + 1:1 alignment with analysis data, **observed Qini == causalml `get_qini` (tie-free, exact)**, random score ⇒ chance, oracle upper-bound + ceiling sanity, display true-lift == 0, revenue true-lift == conversion for outcome-invariant scores (propensity/oracle), gate logic non-vacuous (zero mean ⇒ gate fails), segment interpretability + cohort sums, determinism, artifacts + report content
+- [x] **Full suite: 200/200 tests pass** (186 + 14 uplift). **Day 14 validation hooks green — Week 2 complete → STOP for Gate 2.**
+
 ## Blockers
 
 None.
 
 ## Next actions
 
-1. **Week 2 in progress (Gate 1 passed):** Day 14 uplift (persuadables, Qini curves) → **Gate 2 (human validation) before Week 3**.
-2. **Gate 2** after Day 14 — human validation required before Week 3.
-3. Emerging storyline (Days 8–13): naive ≈ OLS ≈ IPW ≈ DR ≈ ATT ≈ mean-CATE because `sim_u` dominates and the embedded effect is constant in log-odds → observed-X heterogeneity is near-flat (individual-level CATE ranks weak, 0.32–0.77 Spearman). Day 12's master table + Day 13's agreement map frame this honestly (convergence/agreement = shared unobserved bias, demonstrated by display's +0.112 pp estimate vs simulated GT 0.00); Day 18 quantifies the unobserved confounder.
+1. **Stop — Gate 2 (human validation).** Week 2 (Days 8–14) is complete; the full suite is 200/200 and all 4 Day-14 uplift gates are green. Week 3 (Days 15–21) must NOT start before the human validates: Day 15 (CATE segments), Day 16 (incremental ROI), Day 17 (counterfactual simulator), Day 18 (sensitivity — "how strong must U be?"), Day 19 (Streamlit dashboard), Day 20 (tests + polish), Day 21 (README + `v1.0`).
+2. Emerging storyline (Days 8–14): naive ≈ OLS ≈ IPW ≈ DR ≈ ATT ≈ mean-CATE because `sim_u` dominates and the embedded effect is constant in log-odds → observed-X heterogeneity is near-flat. Day 14 shows both faces: the *observed* Qini metric is `sim_u`-confounded (propensity "wins", oracle below chance), while the *true* (counterfactual) metric caps every observed-X ranking at ≈ 0–3% vs a ~27% oracle ceiling — the recoverable targeting signal on observed X is tiny. Day 18 quantifies how strong the unobserved confounder must be.

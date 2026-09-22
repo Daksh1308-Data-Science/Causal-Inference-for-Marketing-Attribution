@@ -34,7 +34,7 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 | 11 | Doubly robust | AIPW (causalml / manual); double-robustness explanation | Results: DR table | Consistent vs OLS/IPW | `Day 11: doubly robust` | ✅ |
 | 12 | ATE/ATT | Master estimate table (point/CI/SE/N/estimator/assumptions); DoWhy backdoor cross-check | `reports/treatment_effects` | Estimator convergence story | `Day 12: ATE/ATT synthesis` | ✅ |
 | 13 | CATE | T/S/X-learners (causalml); compare | `notebooks/03_cate` | Learner agreement map | `Day 13: heterogeneous effects` | ✅ |
-| 14 | Uplift | Persuadables / sure things / lost causes / sleeping dogs; Qini curves; uplift vs propensity | `results/uplift` | Qini above chance; segments interpretable | `Day 14: uplift modeling` | ⬜ |
+| 14 | Uplift | Persuadables / sure things / lost causes / sleeping dogs; Qini curves; uplift vs propensity | `results/uplift` | Qini above chance; segments interpretable | `Day 14: uplift modeling` | ✅ |
 
 **🏁 Gate 2 — STOP after Day 14 and get human validation before Week 3.**
 
@@ -56,9 +56,9 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 
 ## Progress summary (updated after every day)
 
-- **Completed:** Day 0, Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7, Day 8, Day 9, Day 10, Day 11, Day 12, Day 13
+- **Completed:** Day 0, Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7, Day 8, Day 9, Day 10, Day 11, Day 12, Day 13, Day 14
 - **In progress:** —
-- **Next up:** Day 14 (uplift modeling) → **Gate 2 (human validation) BEFORE Week 3**
+- **Next up:** **Gate 2 — human validation of Week 2 (Days 8–14).** Week 3 starts at Day 15 (CATE segments) **only after approval.**
 - **Blockers:** none
 
 > ✅ Day 2 validation hook green: 50/50 tests pass (25 env gate + 25 data schema/cohort/RFM), cohort = 94,983, no dupes, RFM plausible. See `docs/status.md`.
@@ -82,3 +82,7 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 > ✅ Day 11 validation hook green: manual AIPW per channel × outcome, 9 tests pass; DR ≈ IPW ≈ OLS ≈ naive exactly (sim_u unadjusted); double-robustness property verified on synthetic DGP (τ=1.0 recovered under outcome-model misspecification); SEs tighter than naive; email weak-overlap explosion fixed via Day-10-consistent PS clip; full suite 163/163. See `docs/status.md`.
 
 > ✅ Day 12 validation hook green: master ATE/ATT table (48 rows: point/SE/95% CI/N/estimator/assumptions), 12 tests pass; DoWhy backdoor cross-check reproduces OLS to ~1e-13; estimator convergence story verified (all 8 cells within tolerances; convergence = shared unobserved `sim_u` bias, evidenced by display +0.112 pp vs simulated GT 0.00); full suite 175/175. See `docs/status.md`.
+
+> ✅ Day 13 validation hook green: T/S/X meta-learners per channel × outcome, 11 tests pass; learner agreement map — all 8 cells OK (mean CATE within Day-12 OLS ATE tolerance; max pairwise decile spread ≤ 25% of effect size); honest limitation surfaced: individual-level rank agreement only 0.32–0.77 Spearman (observed-X heterogeneity signal is tiny — `sim_u` dominates); full suite 186/186. See `docs/status.md`.
+
+> ✅ Day 14 validation hook green: uplift modeling — 14 tests pass; Qini curves + 4 interpretable segments per channel; all 4 gates green (true-lift above chance: mean 1.12% ≥ 0.5%; display true-lift 0.0 ≤ 0.5%; oracle = max-strategy upper bound 26.7–27.9% vs ~0–3% for every observed-X model — the observed Qini metric is `sim_u`-confounded, propensity 27.4% "wins" and the oracle sits below chance); full suite 200/200. See `docs/status.md`.
