@@ -210,3 +210,16 @@ Status: **Accepted** unless noted. When a decision changes, add a new ADR overri
   - Convergence story verified: all 8 cells within tolerance; convergence evidences a shared unobserved `sim_u` bias rather than agreement on truth (display converges to +0.112 pp vs simulated GT 0.00).
   - Master table = the single source table downstream (ROI, counterfactuals, dashboard) reads from.
   - Full suite 175/175; Day 12 validation hook ("estimator convergence story") green.
+
+## ADR-021 — CATE meta-learners: regressors on the binary outcome + agreement gate calibration (Day 13)
+
+- **Date:** 2026-09-22 · **Status:** Accepted
+- **Context:** Day 13 must estimate heterogeneous effects with T/S/X-learners (causalml) and deliver a "learner agreement map" as its validation hook. Two issues surfaced during implementation.
+- **Decision:**
+  1. **Regressors on the 0/1 conversion outcome** — causalml 0.17's classifier path calls the base learner's hard `predict` (class labels), collapsing a valid probability-scale CATE to ~0 (verified: email conversion T-learner mean ≈ 0.0006, S-learner exactly 0). All meta-learners therefore fit HistGradientBoosting **regressors** on the binary outcome; for a binary outcome the resulting CATE is a probability difference. `random_state` pinned from config `seed` because HistGB's `early_stopping='auto'` otherwise makes a *random* validation split (email conversion mean CATE moved 0.1269 → 0.1290 between unseeded runs).
+  2. **Agreement gate calibrated to the DGP** — the naive idea (gate on pairwise *individual*-level Spearman ≥ 0.7) is wrong here: the observed-X heterogeneity signal is tiny (effect constant in log-odds → near-flat CATE; `sim_u` dominates), so per-unit rank agreement is inherently weak (observed 0.32–0.77). Gating on it would mask an honest limitation. Gate instead on two stable quantities: (a) **mean alignment** — every learner's mean CATE within the Day-12 OLS ATE tolerance (conversion abs 0.01 pp / revenue rel 0.10); (b) **decile-magnitude** — max pairwise decile-curve |Δ| ≤ 25% of the effect size |mean CATE| (observed max 0.092). Normalising the decile spread by SD(mean CATE) was rejected: SD explodes on near-flat signals (observed ratio 1.00 for social conversion → spurious CHECK); the effect size is scale-robust. Individual-level Spearman is reported in the map and the report but is not a gate.
+- **Consequences:**
+  - All 8 channel × outcome cells pass both gates; mean CATEs agree with the Day-12 ATE (max Δ 0.0053 pp conversion / 5.4% revenue).
+  - Determinism: refitting a channel with the pinned seed reproduces the CATE vectors exactly (tested).
+  - The map's central honest finding: learners agree at the aggregate level but per-unit CATE ordering on observed X is not reliable — Day 14 uplift must report Qini/persuadable structure at the aggregate level.
+  - Full suite 185/185; Day 13 validation hook ("learner agreement map") green.

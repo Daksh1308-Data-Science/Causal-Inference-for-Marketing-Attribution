@@ -33,6 +33,16 @@ synthesis:
   convergence_tol_conversion_abs: 0.02       # max range across estimators (pp, absolute)
   convergence_tol_revenue_rel: 0.10          # max range across estimators (relative to |mean|)
 
+# --- CATE meta-learners (Day 13) tunables ---
+cate:
+  base_max_depth: 3            # HistGradientBoosting tree depth for all learners
+  base_max_iter: 100           # boosting iterations
+  bootstrap_reps: 300          # resamples for the mean-CATE CI (fixed seed from `seed`)
+  alpha: 0.05                  # CI level
+  agreement_tol_conversion_abs: 0.01  # hook: |mean CATE - Day-12 ATE| (pp, absolute)
+  agreement_tol_revenue_rel: 0.10     # hook: |mean CATE - Day-12 ATE| (revenue, relative)
+  agreement_max_decile_rel: 0.25      # hook: max pairwise decile-curve |d| / |mean CATE| (effect size; stable for near-flat signals)
+
 # --- Simulated marketing layer (design: docs/data-feasibility.md §4) ---
 # Day 3 ships a clearly-labeled PREVIEW of the layer so channel descriptive
 # stats can be shown; the full campaign-date structure lands in Week 2.

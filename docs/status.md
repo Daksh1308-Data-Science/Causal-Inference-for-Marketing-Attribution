@@ -2,7 +2,7 @@
 
 Updated at the end of every day. Mirrors `docs/roadmap.md`.
 
-Last updated: **Day 12 — complete** (2026-09-22)
+Last updated: **Day 13 — complete** (2026-09-22)
 
 ## Current state
 
@@ -10,7 +10,7 @@ Last updated: **Day 12 — complete** (2026-09-22)
 |---|---|
 | Governance docs | ✅ Done (Day 0) |
 | Week 1 — Data + Causal framework (Days 1–7) | ✅ Complete (Gate 1 validated) |
-| Week 2 — Treatment effect estimation (Days 8–14) | 🟡 Day 12 complete; Days 13–14 next |
+| Week 2 — Treatment effect estimation (Days 8–14) | 🟡 Day 13 complete; Day 14 (uplift) next → Gate 2 |
 | Week 3 — Business + robustness + product (Days 15–21) | ⬜ Not started |
 
 ## Completed
@@ -166,12 +166,23 @@ Last updated: **Day 12 — complete** (2026-09-22)
 - [x] `tests/test_synthesis.py` — 12 tests: master table shape/columns, rows complete (finite SE/CI, ci_lower < point < ci_upper, label, assumptions), estimator labels, DoWhy ≈ OLS (≤1e-6 rel), ATT sane vs OLS + Day-7 pair counts, convergence story all OK + explicit tolerances, DoWhy determinism, files written, plots render, report content
 - [x] **Full suite: 175/175 tests pass** (163 + 12 synthesis). **Day 12 validation hook green.**
 
+### Day 13 — CATE with Meta-Learners (T / S / X) ✅
+- [x] `configs/config.yaml`: `cate:` block (base_max_depth 3, base_max_iter 100, bootstrap_reps 300, agreement tolerances) — no hardcoded magic values
+- [x] `src/causal/cate.py` — **unit-level CATE** per channel × outcome × learner (T/S/X via causalml 0.17 `BaseTLearner`/`BaseSLearner`/`BaseXLearner`) on the Day-4 adjustment sets; `sim_u` never a feature; day-6 propensity p(X) feeds the X-learner; baseline E[Y|X] model provides the heterogeneity axis
+- [x] **Day-13 finding — regressors on the binary outcome:** causalml's classifier path calls the base learner's hard `predict` (class labels), which collapses probability CATE to ~0 (verified: email conversion T ≈ 0.0006, S exactly 0). Fitting HistGradientBoosting **regressors** on the 0/1 outcome yields a valid probability-scale CATE (email conversion T 0.1269 / S 0.1241 / X 0.1278 vs Day-12 OLS 0.1274). `random_state` pinned from config seed (HistGB early-stopping split is otherwise random — mean CATEs moved between unseeded runs)
+- [x] `results/tables/cate_estimates.parquet` (unit-level, 4×2×94,983 rows), `cate_summary.csv` (24 rows: mean + bootstrap 95% CI / SD / quantiles / assumptions / label), `cate_agreement.csv` (pairwise detail), `results/figures/learner_agreement_map.html` + `cate_by_channel.html`, `reports/cate_effects.md`
+- [x] `notebooks/03_cate.ipynb` — built + executed via `scripts/build_notebook_03.py` (reads the committed artifacts, renders the map live; genuine outputs, not fabricated)
+- [x] **Validation hook — learner agreement map (green):** two gates per cell, calibrated to what agreement means on this DGP: (1) every learner's mean CATE within the Day-12 OLS ATE tolerance (max observed Δ 0.0053 pp conversion / 5.4% revenue); (2) max pairwise decile-curve spread ≤ 25% of the effect size (observed max 0.092). All 8 cells **OK**
+- [x] **Honest limitation surfaced by the map:** individual-level rank agreement (pairwise Spearman) is only 0.32–0.77 — the observed-X heterogeneity signal is tiny (`sim_u` dominates; effect constant in log-odds → near-flat CATE), so per-unit CATE ordering is NOT reliable. Reported in the map, deliberately not gated. Gate-2 calibration note: normalising the decile spread by SD(mean CATE) is unstable on near-flat signals (observed ratio 1.00 for social conversion) → normalise by the effect size instead (calc + rationale in `learner_agreement` docstring)
+- [x] `tests/test_cate.py` — 11 tests: unit-level shape + no `sim_u`, summary shape/labels/CI, mean CATE ≈ Day-12 OLS ATE (both tolerances), **agreement hook all-OK + explicit tolerances**, individual agreement reported-not-gated, adjustment-set-only features, determinism (refit same channel identical; summary on loaded frame), artifacts written, report content, notebook deliverable
+- [x] **Full suite: 186/186 tests pass** (175 + 11 cate — includes the notebook deliverable check against built `03_cate.ipynb`). **Day 13 validation hook green.**
+
 ## Blockers
 
 None.
 
 ## Next actions
 
-1. **Week 2 in progress (Gate 1 passed):** Day 13 CATE (T/S/X-learners) → Day 14 uplift (persuadables, Qini).
-2. **Gate 2** after Day 14 — human validation before Week 3.
-3. Emerging storyline (Days 8–12): naive ≈ OLS ≈ IPW ≈ DR ≈ ATT because `sim_u` dominates — Day 12's master table frames this honestly (convergence = shared unobserved bias, demonstrated by display's +0.112 pp estimate vs simulated GT 0.00); Day 18 quantifies the unobserved confounder.
+1. **Week 2 in progress (Gate 1 passed):** Day 14 uplift (persuadables, Qini curves) → **Gate 2 (human validation) before Week 3**.
+2. **Gate 2** after Day 14 — human validation required before Week 3.
+3. Emerging storyline (Days 8–13): naive ≈ OLS ≈ IPW ≈ DR ≈ ATT ≈ mean-CATE because `sim_u` dominates and the embedded effect is constant in log-odds → observed-X heterogeneity is near-flat (individual-level CATE ranks weak, 0.32–0.77 Spearman). Day 12's master table + Day 13's agreement map frame this honestly (convergence/agreement = shared unobserved bias, demonstrated by display's +0.112 pp estimate vs simulated GT 0.00); Day 18 quantifies the unobserved confounder.
