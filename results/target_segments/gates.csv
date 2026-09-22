@@ -1,0 +1,7 @@
+gate,scope,value,threshold,passed,detail
+gt_channels_positive_oracle,email/search (conversion),0.017228,0.005,True,min band oracle mean across email/search > threshold (true effect positive throughout)
+social_negative_oracle,social (conversion),-0.01113,-0.005,True,max band oracle mean for social < threshold (true effect negative throughout)
+display_zero_oracle,display (conversion),0.0,1e-06,True,max |band oracle mean| for display <= threshold (true effect exactly 0)
+estimated_signal_all_positive,all channels (conversion),0.099,0.05,True,min band ESTIMATED CATE > threshold in every channel: the shared sim_u bias pushes ALL estimates positive
+rank_gradient_positive_gt,email/search (conversion),0.001299,0.0001,True,min over email/search of (top-band oracle mean - bottom-band) -> real but tiny rank gradient
+uncertainty_reported,all band rows,1.0,1.0,True,every band row has finite positive SE and ci_low < tau_mean < ci_high

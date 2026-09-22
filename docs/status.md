@@ -2,7 +2,7 @@
 
 Updated at the end of every day. Mirrors `docs/roadmap.md`.
 
-Last updated: **Day 14 — complete** (2026-09-22; awaiting Gate 2 validation)
+Last updated: **Day 15 — complete** (2026-09-22; Gate 2 passed, Week 3 in progress)
 
 ## Current state
 
@@ -10,8 +10,8 @@ Last updated: **Day 14 — complete** (2026-09-22; awaiting Gate 2 validation)
 |---|---|
 | Governance docs | ✅ Done (Day 0) |
 | Week 1 — Data + Causal framework (Days 1–7) | ✅ Complete (Gate 1 validated) |
-| Week 2 — Treatment effect estimation (Days 8–14) | ✅ Day 14 complete → **awaiting Gate 2 human validation** |
-| Week 3 — Business + robustness + product (Days 15–21) | ⬜ Not started |
+| Week 2 — Treatment effect estimation (Days 8–14) | ✅ Complete (Gate 2 validated) |
+| Week 3 — Business + robustness + product (Days 15–21) | 🟡 Day 15 complete; Day 16 (incremental ROI) next → Gate 3 after Day 21 |
 
 ## Completed
 
@@ -187,11 +187,21 @@ Last updated: **Day 14 — complete** (2026-09-22; awaiting Gate 2 validation)
 - [x] `tests/test_uplift.py` — 14 tests: frame schema + 1:1 alignment with analysis data, **observed Qini == causalml `get_qini` (tie-free, exact)**, random score ⇒ chance, oracle upper-bound + ceiling sanity, display true-lift == 0, revenue true-lift == conversion for outcome-invariant scores (propensity/oracle), gate logic non-vacuous (zero mean ⇒ gate fails), segment interpretability + cohort sums, determinism, artifacts + report content
 - [x] **Full suite: 200/200 tests pass** (186 + 14 uplift). **Day 14 validation hooks green — Week 2 complete → STOP for Gate 2.**
 
+### Day 15 — CATE Segmentation & Targeting Guidance ✅
+- [x] `configs/config.yaml`: `segments:` block — `n_bands` 5, gate thresholds calibrated to the measured DGP facts (`gt_positive_min_oracle` 0.005, `social_negative_max_oracle` −0.005, `display_oracle_zero_tol` 1e-6, `est_all_positive_min` 0.05, `rank_gap_min` 0.0001) + `results.target_segments` path
+- [x] `src/causal/segments.py` — quintile **bands** of the Day-13 ensemble CATE per channel × outcome (bottom … top + `all` reference row), each with estimated CATE + analytic SE + 95% CI, **counterfactual oracle mean** + oracle negative share, observed conv/rev rate and baseline; **targeting guidance** per channel (Run / Skip / No budget) grounded in the counterfactual sign structure; 2 figures; report
+- [x] **Key finding — the estimated sign structure cannot recover the true sign:** every channel's estimated CATE is positive in every band (email 0.126 / search 0.126 / social 0.107 / display 0.112 conversion mean; 0% negative units) — the shared `sim_u` bias. Only the **counterfactual** oracle explains the pattern: email/search positive for every unit, social negative for every unit (100% negative share), display exactly zero. A real analyst using only observed data would wrongly conclude *all* channels help
+- [x] **Rank gradient (measured, not assumed):** ρ(ensemble CATE, true effect) ≈ +0.05/+0.06 conversion for email/search, ≈ 0 display, slightly negative social; top-band true effect beats the bottom's by only +0.13/+0.17 pp — real but tiny; guidance is per-*channel*, never per-customer
+- [x] `results/target_segments/{target_segments,guidance,gates}.csv`, `results/figures/{target_bands_conversion,cate_distribution_conversion}.html`, `reports/cate_segmentation.md`
+- [x] **Validation hooks — all 6 gates green:** gt_channels_positive_oracle, social_negative_oracle, display_zero_oracle, estimated_signal_all_positive (bias demonstration), rank_gradient_positive_gt, uncertainty_reported
+- [x] `tests/test_cate_segments.py` — 13 tests: schema/coverage/canonical band order, uncertainty, bias-demo + oracle sign structure vs DGP, rank gradient, gates pass, **gate non-vacuity** (flipped social oracle ⇒ gate fails; negative estimated CATE ⇒ bias-demo gate fails), guidance recommendations/signs, determinism, artifacts + report content
+- [x] **Full suite: 213/213 tests pass** (200 + 13 segments). **Day 15 validation hook green — Week 3 in progress.**
+
 ## Blockers
 
 None.
 
 ## Next actions
 
-1. **Stop — Gate 2 (human validation).** Week 2 (Days 8–14) is complete; the full suite is 200/200 and all 4 Day-14 uplift gates are green. Week 3 (Days 15–21) must NOT start before the human validates: Day 15 (CATE segments), Day 16 (incremental ROI), Day 17 (counterfactual simulator), Day 18 (sensitivity — "how strong must U be?"), Day 19 (Streamlit dashboard), Day 20 (tests + polish), Day 21 (README + `v1.0`).
-2. Emerging storyline (Days 8–14): naive ≈ OLS ≈ IPW ≈ DR ≈ ATT ≈ mean-CATE because `sim_u` dominates and the embedded effect is constant in log-odds → observed-X heterogeneity is near-flat. Day 14 shows both faces: the *observed* Qini metric is `sim_u`-confounded (propensity "wins", oracle below chance), while the *true* (counterfactual) metric caps every observed-X ranking at ≈ 0–3% vs a ~27% oracle ceiling — the recoverable targeting signal on observed X is tiny. Day 18 quantifies how strong the unobserved confounder must be.
+1. Week 3 in progress (Gate 2 approved): Day 16 (incremental ROI — config cost assumptions, observational vs causal ROI per channel) → Day 17 (counterfactual simulator) → Day 18 (sensitivity — "how strong must U be?") → Day 19 (Streamlit dashboard) → Day 20 (tests + polish) → Day 21 (README + `v1.0`) → **Gate 3 (final validation)**.
+2. Emerging storyline (Days 8–15): naive ≈ OLS ≈ IPW ≈ DR ≈ ATT ≈ mean-CATE because `sim_u` dominates; the observed-X heterogeneity signal is near-flat AND cannot recover even the *sign* of per-channel effects (Day 15: all estimated CATEs positive; counterfactual truth = email/search +, social −, display 0; band gradients tiny, ρ 0.01–0.06). Day 16 converts the ATE estimates to incremental revenue at config'ed channel costs; Day 18 quantifies how strong the unobserved confounder must be.

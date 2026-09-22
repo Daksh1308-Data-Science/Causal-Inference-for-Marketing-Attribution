@@ -237,3 +237,16 @@ Status: **Accepted** unless noted. When a decision changes, add a new ADR overri
   - Display (embedded effect 0.00) true-lift == 0.0 for every strategy — the honest null.
   - Revenue true-lift == conversion true-lift for outcome-invariant scores (propensity) and monotone labels (oracle); uplift/baseline are per-outcome models so their lifts differ.
   - 4 uplift gates green; full suite 200/200. Day 14 closes Week 2 → **Gate 2 (human validation) required before Week 3.**
+
+## ADR-023 — CATE segmentation: quantified quintile bands + counterfactual sign structure; guidance is per-channel, not per-customer (Day 15)
+
+- **Date:** 2026-09-22 · **Status:** Accepted
+- **Context:** Day 15 must deliver the roadmap's "target-segment table" with high/zero/negative-effect segments and targeting guidance ("Segments explain pattern" hook). Two facts block the naive design: (1) the estimated CATE is positive in **every** band of **every** channel (email 0.126 / search 0.126 / social 0.107 / display 0.112 conversion mean; 0% negative units) — the shared `sim_u` bias means a sign-based segment split on observed data is empty; (2) the ensemble-vs-truth rank correlation is ρ ≈ 0.01–0.06 (weaker than the Day-13 learner agreement, which measured mutual consistency, not truth), so per-customer targeting claims are unsupportable.
+- **Decision:**
+  1. **Segments = quintile bands of the ensemble CATE per cell** (`n_bands` 5: bottom … top + an `all` reference), each row carrying the estimated CATE with analytic SE + 95% normal CI AND the **counterfactual oracle mean** + oracle negative share — so the table always shows what targeting a band would *actually* achieve (simulation-only) next to what the model claims.
+  2. **Guidance is per-channel and grounded in the counterfactual sign structure**, not the biased estimates: Run (email/search — positive throughout), Skip/avoid (social — negative for ~100% of the audience), No budget (display — effect exactly 0). The report states plainly that the *estimated* sign structure is wrong everywhere and explains the pattern only via the oracle.
+  3. **Gate set split into machinery + empirical:** oracle sign-structure gates (email/search positive throughout, social negative throughout, display zero — DGP-plumbing checks), `estimated_signal_all_positive` (the bias demonstration), `rank_gradient_positive_gt` (email/search top−bottom oracle gap > 0.0001 — real but tiny, calibrated 0.13/0.17 pp), `uncertainty_reported`. Social's flat-to-inverted gradient is reported, deliberately not gated (the honest finding is "harm-avoidance is unreachable on observed X").
+- **Consequences:**
+  - Target-segment table + guidance land with every number labeled estimated vs counterfactual; a CMO sees "run email/search, skip social, zero-budget display" and a data scientist sees the band table with CIs and oracle columns.
+  - Band gradients quantify the known limit: even the top band beats the bottom by only ~0.1–0.2 pp of incremental conversion — micro-targeting on observed X is nearly worthless; budget decisions are channel-level.
+  - 6 gates green; full suite 213/213. Sets up Day 16 (ROI at config costs), Day 17 (counterfactual scenarios), Day 18 (sensitivity) on the same honest baseline.

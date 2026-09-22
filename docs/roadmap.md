@@ -42,7 +42,7 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 
 | Day | Focus | Tasks (Python / SQL) | Deliverable | Validation | Commit | Status |
 |-----|-------|----------------------|-------------|------------|--------|:------:|
-| 15 | CATE segments | Segment deep-dive: high/zero/negative effects → targeting guidance | Target-segment table | Segments explain pattern | `Day 15: CATE segmentation` | ⬜ |
+| 15 | CATE segments | Segment deep-dive: high/zero/negative effects → targeting guidance | Target-segment table | Segments explain pattern | `Day 15: CATE segmentation` | ✅ |
 | 16 | ROI | Cost assumptions in config; observational vs causal ROI table | `reports/roi` | ROI complete per channel | `Day 16: incremental ROI` | ⬜ |
 | 17 | Counterfactuals | Scenarios A–D simulator + bootstrap uncertainty + extrapolation limits | `results/counterfactuals` | Uncertainty reported; limits stated | `Day 17: counterfactual simulator` | ⬜ |
 | 18 | Sensitivity | E-value, bias formula, placebo tests, alt adjustment sets/estimators; "how strong must U be?" | `reports/sensitivity` | Each claim stress-tested | `Day 18: sensitivity analysis` | ⬜ |
@@ -56,9 +56,9 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 
 ## Progress summary (updated after every day)
 
-- **Completed:** Day 0, Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7, Day 8, Day 9, Day 10, Day 11, Day 12, Day 13, Day 14
-- **In progress:** —
-- **Next up:** **Gate 2 — human validation of Week 2 (Days 8–14).** Week 3 starts at Day 15 (CATE segments) **only after approval.**
+- **Completed:** Day 0, Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7, Day 8, Day 9, Day 10, Day 11, Day 12, Day 13, Day 14, Day 15
+- **In progress:** Day 16 (incremental ROI)
+- **Next up:** Day 16 — ROI (cost assumptions in config; observational vs causal ROI per channel)
 - **Blockers:** none
 
 > ✅ Day 2 validation hook green: 50/50 tests pass (25 env gate + 25 data schema/cohort/RFM), cohort = 94,983, no dupes, RFM plausible. See `docs/status.md`.
@@ -86,3 +86,5 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 > ✅ Day 13 validation hook green: T/S/X meta-learners per channel × outcome, 11 tests pass; learner agreement map — all 8 cells OK (mean CATE within Day-12 OLS ATE tolerance; max pairwise decile spread ≤ 25% of effect size); honest limitation surfaced: individual-level rank agreement only 0.32–0.77 Spearman (observed-X heterogeneity signal is tiny — `sim_u` dominates); full suite 186/186. See `docs/status.md`.
 
 > ✅ Day 14 validation hook green: uplift modeling — 14 tests pass; Qini curves + 4 interpretable segments per channel; all 4 gates green (true-lift above chance: mean 1.12% ≥ 0.5%; display true-lift 0.0 ≤ 0.5%; oracle = max-strategy upper bound 26.7–27.9% vs ~0–3% for every observed-X model — the observed Qini metric is `sim_u`-confounded, propensity 27.4% "wins" and the oracle sits below chance); full suite 200/200. See `docs/status.md`.
+
+> ✅ Day 15 validation hook green: CATE segmentation — 13 tests pass; target-segment table (5 bands + `all` per channel × outcome) + per-channel Run/Skip/No-budget guidance; all 6 gates green, incl. the honest pattern: every estimated CATE is positive in every band (shared `sim_u` bias — observed data cannot recover even the sign), while the counterfactual oracle shows email/search +, social −, display 0; rank gradient real but tiny (top−bottom oracle +0.13/+0.17 pp, ρ 0.05–0.06); full suite 213/213. Gate 2 approved by the human. See `docs/status.md`.
