@@ -32,7 +32,7 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 | 9 | Regression adjustment | OLS treatment coeff, CIs, spec, limitations | Results: OLS table | CIs sane vs naive | `Day 9: regression adjustment` | ✅ |
 | 10 | IPW | Stabilized weights, ESS, extreme-weight handling | Results: IPW table | ESS reported; weights bounded | `Day 10: inverse probability weighting` | ✅ |
 | 11 | Doubly robust | AIPW (causalml / manual); double-robustness explanation | Results: DR table | Consistent vs OLS/IPW | `Day 11: doubly robust` | ✅ |
-| 12 | ATE/ATT | Master estimate table (point/CI/SE/N/estimator/assumptions); DoWhy backdoor cross-check | `reports/treatment_effects` | Estimator convergence story | `Day 12: ATE/ATT synthesis` | ⬜ |
+| 12 | ATE/ATT | Master estimate table (point/CI/SE/N/estimator/assumptions); DoWhy backdoor cross-check | `reports/treatment_effects` | Estimator convergence story | `Day 12: ATE/ATT synthesis` | ✅ |
 | 13 | CATE | T/S/X-learners (causalml); compare | `notebooks/03_cate` | Learner agreement map | `Day 13: heterogeneous effects` | ⬜ |
 | 14 | Uplift | Persuadables / sure things / lost causes / sleeping dogs; Qini curves; uplift vs propensity | `results/uplift` | Qini above chance; segments interpretable | `Day 14: uplift modeling` | ⬜ |
 
@@ -56,9 +56,9 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 
 ## Progress summary (updated after every day)
 
-- **Completed:** Day 0, Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7, Day 8, Day 9, Day 10, Day 11
+- **Completed:** Day 0, Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7, Day 8, Day 9, Day 10, Day 11, Day 12
 - **In progress:** —
-- **Next up:** Day 12 (ATE/ATT synthesis) → Gate 2 after Day 14
+- **Next up:** Day 13 (heterogeneous effects / CATE) → Gate 2 after Day 14
 - **Blockers:** none
 
 > ✅ Day 2 validation hook green: 50/50 tests pass (25 env gate + 25 data schema/cohort/RFM), cohort = 94,983, no dupes, RFM plausible. See `docs/status.md`.
@@ -78,3 +78,7 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 > ✅ Day 9 validation hook green: OLS per channel × outcome (HC3 robust SE, 95% CI), 11 tests pass; CIs sane vs naive (SE ratio 0.5–2.0); honest finding — observed-confounder adjustment barely moves the gap because latent `sim_u` dominates confounding (by design); full suite 142/142. See `docs/status.md`.
 
 > ✅ Day 10 validation hook green: stabilized IPW per channel × outcome, 12 tests pass; ESS reported (raw + after Cole–Hernán truncation, weights bounded at cap 10); email ESS recovered 2.4 → 86,328; bootstrap CI; IPW ≈ OLS ≈ naive (sim_u dominates); full suite 154/154. See `docs/status.md`.
+
+> ✅ Day 11 validation hook green: manual AIPW per channel × outcome, 9 tests pass; DR ≈ IPW ≈ OLS ≈ naive exactly (sim_u unadjusted); double-robustness property verified on synthetic DGP (τ=1.0 recovered under outcome-model misspecification); SEs tighter than naive; email weak-overlap explosion fixed via Day-10-consistent PS clip; full suite 163/163. See `docs/status.md`.
+
+> ✅ Day 12 validation hook green: master ATE/ATT table (48 rows: point/SE/95% CI/N/estimator/assumptions), 12 tests pass; DoWhy backdoor cross-check reproduces OLS to ~1e-13; estimator convergence story verified (all 8 cells within tolerances; convergence = shared unobserved `sim_u` bias, evidenced by display +0.112 pp vs simulated GT 0.00); full suite 175/175. See `docs/status.md`.

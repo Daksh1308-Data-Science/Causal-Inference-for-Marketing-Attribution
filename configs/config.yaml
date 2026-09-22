@@ -27,6 +27,12 @@ ipw:
   bootstrap_reps: 500     # resamples for bootstrap CI (fixed seed from `seed`)
   alpha: 0.05             # CI level
 
+# --- ATE/ATT synthesis (Day 12) tunables ---
+synthesis:
+  dowhy_method: backdoor.linear_regression   # DoWhy estimator for the cross-check
+  convergence_tol_conversion_abs: 0.02       # max range across estimators (pp, absolute)
+  convergence_tol_revenue_rel: 0.10          # max range across estimators (relative to |mean|)
+
 # --- Simulated marketing layer (design: docs/data-feasibility.md §4) ---
 # Day 3 ships a clearly-labeled PREVIEW of the layer so channel descriptive
 # stats can be shown; the full campaign-date structure lands in Week 2.

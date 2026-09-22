@@ -2,7 +2,7 @@
 
 Updated at the end of every day. Mirrors `docs/roadmap.md`.
 
-Last updated: **Day 11 — complete** (2026-09-21)
+Last updated: **Day 12 — complete** (2026-09-22)
 
 ## Current state
 
@@ -10,7 +10,7 @@ Last updated: **Day 11 — complete** (2026-09-21)
 |---|---|
 | Governance docs | ✅ Done (Day 0) |
 | Week 1 — Data + Causal framework (Days 1–7) | ✅ Complete (Gate 1 validated) |
-| Week 2 — Treatment effect estimation (Days 8–14) | 🟡 Day 11 complete; Days 12–14 next |
+| Week 2 — Treatment effect estimation (Days 8–14) | 🟡 Day 12 complete; Days 13–14 next |
 | Week 3 — Business + robustness + product (Days 15–21) | ⬜ Not started |
 
 ## Completed
@@ -155,12 +155,23 @@ Last updated: **Day 11 — complete** (2026-09-21)
 - [x] `tests/test_doubly_robust.py` — 9 tests: rows present, consistent vs OLS/IPW (validation hook), IF SE/CI finite & ordered, email truncation reported (n_ps_truncated ≥ 13), no email explosion, **double-robustness property on synthetic DGP**, files written, report explains double robustness + sim_u, determinism
 - [x] **Full suite: 163/163 tests pass** (154 + 9 doubly robust). **Day 11 validation hook green.**
 
+### Day 12 — ATE/ATT Synthesis ✅
+- [x] `configs/config.yaml`: `synthesis:` block (dowhy_method `backdoor.linear_regression`, conversion abs tol 0.02 pp, revenue rel tol 0.10) — no hardcoded magic values
+- [x] `src/causal/synthesis.py` — **master estimate table**: channel × outcome × estimator (naive, OLS, IPW, DR, ATT-matched, DoWhy backdoor) → point / SE / 95% CI / N / assumptions per row, all labeled `estimated (simulated)`
+- [x] ATT from the Day-7 matched sample (1:1 NN, caliper): matched-pair diff-in-means with two-sample SE + normal CI (e.g., email conversion ATT 0.1291, N = 28,118 pairs)
+- [x] **DoWhy backdoor cross-check** (Day 5 stack, classic API): `identify_effect` + `backdoor.linear_regression` with the real data — reproduces the Day-9 OLS ATE to ~1e-13 per cell (independent implementation of the same model, validating the full DoWhy pipeline)
+- [x] **Compat shims (documented in module docstring):** DoWhy 0.8 calls `nx.algorithms.d_separated` (renamed `is_d_separator` in nx ≥ 2.6) and reads `model.params[0]` positionally (broken on pandas ≥ 2 string-indexed Series) — both fixed idempotently inside `synthesis.py`, no site-packages edits
+- [x] `results/tables/master_estimates.csv` (48 rows), `results/figures/estimator_convergence_{conversion,revenue}.html` (all six estimators with 95% CI error bars), `reports/treatment_effects.md`
+- [x] **Validation hook — estimator convergence story (green):** naive ≈ OLS ≈ IPW ≈ DR ≈ ATT across all 8 cells within tolerances (max conversion spread 0.0035 pp < 0.02; max revenue spread ~6% < 10%). **Convergence is not correctness:** display (simulated GT 0.00) converges to +0.112—+0.112 pp, so agreement here evidences a common UNOBSERVED bias (`sim_u`) shared by every estimator
+- [x] `tests/test_synthesis.py` — 12 tests: master table shape/columns, rows complete (finite SE/CI, ci_lower < point < ci_upper, label, assumptions), estimator labels, DoWhy ≈ OLS (≤1e-6 rel), ATT sane vs OLS + Day-7 pair counts, convergence story all OK + explicit tolerances, DoWhy determinism, files written, plots render, report content
+- [x] **Full suite: 175/175 tests pass** (163 + 12 synthesis). **Day 12 validation hook green.**
+
 ## Blockers
 
 None.
 
 ## Next actions
 
-1. **Week 2 in progress (Gate 1 passed):** Day 12 ATE/ATT synthesis → Days 13–14 CATE/uplift.
+1. **Week 2 in progress (Gate 1 passed):** Day 13 CATE (T/S/X-learners) → Day 14 uplift (persuadables, Qini).
 2. **Gate 2** after Day 14 — human validation before Week 3.
-3. Emerging storyline (Days 8–11): naive ≈ OLS ≈ IPW ≈ DR because `sim_u` dominates — Day 12 synthesis frames this honestly; Day 18 quantifies the unobserved confounder.
+3. Emerging storyline (Days 8–12): naive ≈ OLS ≈ IPW ≈ DR ≈ ATT because `sim_u` dominates — Day 12's master table frames this honestly (convergence = shared unobserved bias, demonstrated by display's +0.112 pp estimate vs simulated GT 0.00); Day 18 quantifies the unobserved confounder.

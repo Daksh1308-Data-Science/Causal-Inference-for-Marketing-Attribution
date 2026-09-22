@@ -194,3 +194,19 @@ Status: **Accepted** unless noted. When a decision changes, add a new ADR overri
   - IPW ATE ≈ OLS ≈ naive (email conv 0.1287 vs 0.1274 vs 0.1252) — reweighting on observed confounders cannot remove `sim_u` selection; consistent with Day-9 finding.
   - Bootstrap CI captures design variability, not PS/model misspecification — stated as a limitation.
   - Full suite 154/154; Day 10 validation hook ("ESS reported; weights bounded") green.
+
+## ADR-020 — Master ATE/ATT table + DoWhy backdoor cross-check (Day 12)
+
+- **Date:** 2026-09-22 · **Status:** Accepted
+- **Context:** Days 8-11 produced four ATE families (naive, OLS, IPW, DR) plus a Day-7 matched sample (ATT), each in its own report. Day 12 must present one comparable master table and independently validate the pipeline with the DoWhy machinery introduced on Day 5.
+- **Decision:**
+  - `src/causal/synthesis.py` builds a single long table: channel × outcome × {naive, OLS, IPW, DR, ATT-matched, DoWhy-backdoor} → point / SE / 95% CI / N / assumptions, every row labeled `estimated (simulated)`.
+  - ATT read from Day-7 1:1 NN matched pairs (two-sample SE + normal CI), no re-fit.
+  - DoWhy cross-check = `backdoor.linear_regression` on the real data through the classic API (`identify_effect` + `estimate_effect`); SE/CI reused from the Day-9 OLS table because DoWhy's linear-regression estimate is the same OLS by construction (flagged in `assumptions`).
+  - Compat shims (idempotent, in-module, no site-packages edits): `nx.algorithms.d_separated` → `is_d_separator` (nx ≥ 2.6 rename) and a pandas-2-safe replacement of dowhy 0.8's `RegressionEstimator._estimate_effect` (`params[0]` → `params.iloc[0]`).
+  - Convergence tolerances config-driven: `synthesis.convergence_tol_conversion_abs` (0.02 pp, absolute), `synthesis.convergence_tol_revenue_rel` (0.10, relative) — match the test contract.
+- **Consequences:**
+  - DoWhy reproduces OLS to ~1e-13 on all 8 cells → pipeline validated end-to-end (identification + estimation) on real data.
+  - Convergence story verified: all 8 cells within tolerance; convergence evidences a shared unobserved `sim_u` bias rather than agreement on truth (display converges to +0.112 pp vs simulated GT 0.00).
+  - Master table = the single source table downstream (ROI, counterfactuals, dashboard) reads from.
+  - Full suite 175/175; Day 12 validation hook ("estimator convergence story") green.
