@@ -250,3 +250,17 @@ Status: **Accepted** unless noted. When a decision changes, add a new ADR overri
   - Target-segment table + guidance land with every number labeled estimated vs counterfactual; a CMO sees "run email/search, skip social, zero-budget display" and a data scientist sees the band table with CIs and oracle columns.
   - Band gradients quantify the known limit: even the top band beats the bottom by only ~0.1–0.2 pp of incremental conversion — micro-targeting on observed X is nearly worthless; budget decisions are channel-level.
   - 6 gates green; full suite 213/213. Sets up Day 16 (ROI at config costs), Day 17 (counterfactual scenarios), Day 18 (sensitivity) on the same honest baseline.
+
+## ADR-024 — Incremental ROI: three labeled methods (observational / causal / counterfactual) + cost assumptions in config (Day 16)
+
+- **Date:** 2026-09-22 · **Status:** Accepted
+- **Context:** Day 16 must deliver the roadmap's ROI deliverable (`reports/roi`, "ROI complete per channel"). Two design hazards: (1) Olist has no spend data, so costs are pure assumptions (ADR-006: put them in `configs/config.yaml`); (2) the Day-12 convergence story means ALL estimators are `sim_u`-biased — a "causal ROI" table alone would recommend funding display/social.
+- **Decision:**
+  1. **Costs = config assumptions, per-treated-customer R$ over the 14-day window** (`roi.cost_per_treated`: email 0.10, search 1.50, display 0.20, social 0.80 — Brazilian e-commerce order-of-magnitude). ROI = `(incremental revenue per treated − cost)/cost` (blueprint §9, exact).
+  2. **Three methods per channel, every row labeled** (AGENTS.md §2): *observational* (Day-8 naive ATE — attribution-style), *causal* (Day-12 DR ATE, CI propagated through the monotone ROI transform — no delta method needed), *counterfactual* (true per-treated effect from the DGP oracle, simulation-only, CI collapses to the point). Summary table adds the `causal ÷ truth` overstatement multiple (NaN where the truth is negative — sign-flipped ratios are unquotable) and cohort net value = n_treated × net.
+  3. **Gate on completeness + the honest pattern**: `complete_rows` (12 rows, positive costs, finite ROIs), `causal_roi_positive` (the bias demonstration — even causal ROI is positive everywhere), `ctf_email_search_positive` / `ctf_social_display_negative` (counterfactual truth), `overstatement_documented` (email/search ratio > 1), `uncertainty_reported`.
+- **Consequences:**
+  - Causal ROI: email 17,265%, search 1,112%, display 7,983%, social 1,912% — all wildly positive; naive ROI is similar (both confounded). Counterfactual: email 2,314%, search 101%, **social −299%, display −100%**. Overstatement ~7.5x (email) / ~11x (search); display/social sign-flipped.
+  - Breakeven reads: email/search profitable at any cost below their true incremental revenue (R$ 2.41 / R$ 3.02 per treated); social/display can never break even — no cost assumption rescues them.
+  - Cohort net value (counterfactual): +R$ 65,673 email, +R$ 48,167 search, −R$ 58,661 social, −R$ 7,094 display.
+  - 6 gates green; full suite 225/225. Sets up Day 17 (counterfactual budget scenarios from these numbers) and Day 18 (sensitivity).

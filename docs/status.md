@@ -2,7 +2,7 @@
 
 Updated at the end of every day. Mirrors `docs/roadmap.md`.
 
-Last updated: **Day 15 — complete** (2026-09-22; Gate 2 passed, Week 3 in progress)
+Last updated: **Day 16 — complete** (2026-09-22; Week 3 in progress)
 
 ## Current state
 
@@ -11,7 +11,7 @@ Last updated: **Day 15 — complete** (2026-09-22; Gate 2 passed, Week 3 in prog
 | Governance docs | ✅ Done (Day 0) |
 | Week 1 — Data + Causal framework (Days 1–7) | ✅ Complete (Gate 1 validated) |
 | Week 2 — Treatment effect estimation (Days 8–14) | ✅ Complete (Gate 2 validated) |
-| Week 3 — Business + robustness + product (Days 15–21) | 🟡 Day 15 complete; Day 16 (incremental ROI) next → Gate 3 after Day 21 |
+| Week 3 — Business + robustness + product (Days 15–21) | 🟡 Day 16 complete; Day 17 (counterfactuals) next → Gate 3 after Day 21 |
 
 ## Completed
 
@@ -197,11 +197,20 @@ Last updated: **Day 15 — complete** (2026-09-22; Gate 2 passed, Week 3 in prog
 - [x] `tests/test_cate_segments.py` — 13 tests: schema/coverage/canonical band order, uncertainty, bias-demo + oracle sign structure vs DGP, rank gradient, gates pass, **gate non-vacuity** (flipped social oracle ⇒ gate fails; negative estimated CATE ⇒ bias-demo gate fails), guidance recommendations/signs, determinism, artifacts + report content
 - [x] **Full suite: 213/213 tests pass** (200 + 13 segments). **Day 15 validation hook green — Week 3 in progress.**
 
+### Day 16 — Incremental ROI (Observational vs Causal) ✅
+- [x] `configs/config.yaml`: `roi:` block — per-treated-customer **cost assumptions** in R$ over the 14-day window (`email 0.10 / search 1.50 / display 0.20 / social 0.80`; ADR-006: costs are config assumptions, Olist has no spend data) + gate thresholds + `results.roi` path
+- [x] `src/causal/roi.py` — `ROI = (incremental revenue per treated − cost) / cost` (blueprint §9), three methods per channel: **observational** (Day-8 naive ATE → attribution-style ROI), **causal** (Day-12 DR ATE, CI propagated through the monotone transform), **counterfactual** (true per-treated effect from the DGP oracle, simulation-only); summary view (obs/causal+CI/ctf ROI, causal÷truth overstatement multiple, cohort net truth = n_treated × net); 1 figure; report
+- [x] **Key finding — even the *causal* ROI overstates every channel here:** the Day-12 estimators converge to ≈ +16–18 R$/treated for **every** channel (display +16.2, social +16.1) — `sim_u` bias in money terms. Causal ROI is positive everywhere (email 17,265% / search 1,112% / display 7,983% / social 1,912%) and barely beats the naive attribution ROI. Only the **counterfactual** column reveals the truth: email 2,314% (excellent), search 101% (modest), **social −299% and display −100%** (value-destroying). `Causal ÷ truth`: **~7.5x email, ~11x search**, sign-flipped for social/display — no cost assumption can rescue them (breakeven reads in the report)
+- [x] `results/roi/{roi_long,roi_summary,roi_gates}.csv`, `results/figures/roi_comparison.html` (faceted bars, CI error bars, breakeven line at ROI 1), `reports/roi.md`
+- [x] **Validation hooks — all 6 gates green:** complete_rows (12 rows), causal_roi_positive (bias demo), ctf_email_search_positive, ctf_social_display_negative, overstatement_documented (7.5/11.0 > 1), uncertainty_reported (CI propagated; counterfactual CI collapses to the point)
+- [x] `tests/test_roi.py` — 12 tests: schema/labels/n_treated from frame, cost-from-config, CI propagation + uncertainty, the honest causal-vs-counterfactual pattern, overstatement multiple, cohort net, gates pass, **gate non-vacuity** (display ctf flipped to positive ⇒ gate fails; search causal ROI flipped negative ⇒ gate fails), determinism, artifacts + report content, no literal escapes
+- [x] **Full suite: 225/225 tests pass** (213 + 12 roi). **Day 16 validation hook green — Week 3 in progress.**
+
 ## Blockers
 
 None.
 
 ## Next actions
 
-1. Week 3 in progress (Gate 2 approved): Day 16 (incremental ROI — config cost assumptions, observational vs causal ROI per channel) → Day 17 (counterfactual simulator) → Day 18 (sensitivity — "how strong must U be?") → Day 19 (Streamlit dashboard) → Day 20 (tests + polish) → Day 21 (README + `v1.0`) → **Gate 3 (final validation)**.
-2. Emerging storyline (Days 8–15): naive ≈ OLS ≈ IPW ≈ DR ≈ ATT ≈ mean-CATE because `sim_u` dominates; the observed-X heterogeneity signal is near-flat AND cannot recover even the *sign* of per-channel effects (Day 15: all estimated CATEs positive; counterfactual truth = email/search +, social −, display 0; band gradients tiny, ρ 0.01–0.06). Day 16 converts the ATE estimates to incremental revenue at config'ed channel costs; Day 18 quantifies how strong the unobserved confounder must be.
+1. Week 3 in progress (Gate 2 approved): Day 17 (counterfactual simulator — budget scenarios), Day 18 (sensitivity — "how strong must U be?"), Day 19 (Streamlit dashboard), Day 20 (tests + polish), Day 21 (README + `v1.0`) → **Gate 3 (final validation)**.
+2. Emerging storyline (Days 8–16): naive ≈ OLS ≈ IPW ≈ DR ≈ ATT ≈ mean-CATE because `sim_u` dominates — Day 16 now quantifies the business consequence: even causal ROI is positive for every channel (≈1,100%–17,000%), while the counterfactual truth is email/search profitable and social/display value-destroying (true ROI −100%/−299%). The observed-X targeting signal is near-flat and sign-blind (Days 13–15). Day 18 bounds how strong `sim_u` must be; Day 17 turns the ROI story into explicit budget scenarios.

@@ -1,0 +1,7 @@
+gate,scope,value,threshold,passed,detail
+complete_rows,all channels,12.0,12.0,True,12 rows; positive costs; finite ROI point/CI; positive treated counts
+causal_roi_positive,all channels,11.1234,0.0,True,min causal ROI > threshold (sim_u bias makes even causal ROI positive everywhere)
+ctf_email_search_positive,email/search,1.01367,0.0,True,counterfactual ROI positive for email/search (true effect positive)
+ctf_social_display_negative,social/display,-1.0,0.0,True,"counterfactual ROI negative for social (negative effect) and display (zero effect, cost unrecovered)"
+overstatement_documented,email/search,7.461,1.0,True,causal ROI / counterfactual ROI > threshold for email/search (documented overstatement)
+uncertainty_reported,all rows,1.0,1.0,True,every row has finite ROI with sane CI bounds (counterfactual CI collapses to the point)
