@@ -67,6 +67,11 @@ Cohort: **94,983 customers** (98,199 purchased orders, deduplicated, with ≥ 1 
   - *Consistency* — exposure is well-defined per channel (simulation guarantees the counterfactual is coherent).
   - *SUTVA/no interference* — treated as plausible per-channel (no spillover designed into the simulation).
 
+<p align="center">
+  <img src="results/figures/readme_dag_email.png" alt="Causal DAG for email — sim_u (unobserved intent) confounds exposure and outcome" width="80%">
+  <br><em>Figure 1 — Per-channel causal DAG (email): observed covariates and the latent <code>sim_u</code> open backdoor paths from exposure to outcome. `sim_u` is unobserved to every estimator (interactive version: <code>results/figures/dag_email.html</code>).</em>
+</p>
+
 ## 6. The simulated marketing layer (design summary)
 
 Full design: `docs/data-feasibility.md` §4. Highlights:
@@ -75,6 +80,11 @@ Full design: `docs/data-feasibility.md` §4. Highlights:
 - Outcome: baseline 14-day purchase intent (log-odds −1.6) + `sim_u` coefficient 1.0 + channel effect + noise; revenue is log-normal (mean 4.6, σ 0.8).
 - **Embedded ground truth:** email +0.12 log-odds, search +0.15, display 0.00, social −0.08.
 - The DGP oracle (read from the simulator, not from any estimator) is the *simulated ground truth* used for validation — a yardstick that a real observational study never has.
+
+<p align="center">
+  <img src="results/figures/13_sim_naive_conversion.png" alt="Simulated channel exposure rates and naive conversion by channel" width="80%">
+  <br><em>Figure 2 — Simulated exposure rates and naive observed conversion per channel (correlational — selection, not proof).</em>
+</p>
 
 ## 7. Pipeline architecture
 
@@ -135,6 +145,11 @@ Textbook instinct: "if six estimators agree, the effect is real." Wrong here —
 
 **Master table:** `results/tables/master_estimates.csv` (point / SE / 95% CI / N / estimator / assumptions / label) — every row CI'd, never a bare point.
 
+<p align="center">
+  <img src="results/figures/readme_convergence_revenue.png" alt="Estimator convergence: six confounded estimators per channel agree, all missing the oracle truth" width="90%">
+  <br><em>Figure 3 — Six estimators converge per channel (R$, 95% CI) — and collectively miss the simulated oracle truth. Convergence across re-weighted versions of the same observed set is not identification.</em>
+</p>
+
 ## 11. Finding 2 — incremental revenue and ROI (the money term)
 
 ROI = (incremental revenue per treated − cost per treated) / cost per treated, with per-channel costs as **config assumptions** (ADR-006; R$ per treated over the 14-day window: email 0.10, search 1.50, display 0.20, social 0.80).
@@ -151,6 +166,11 @@ ROI = (incremental revenue per treated − cost per treated) / cost per treated,
 - Overstatement is quantifiable: **~7.5× email, ~11× search**; sign-flipped for social/display.
 - Causal ROI report: `reports/roi.md`; table: `results/roi/roi_{summary,long}.csv` (CI columns included).
 
+<p align="center">
+  <img src="results/figures/readme_roi.png" alt="Causal ROI vs counterfactual ROI per channel (symlog)" width="85%">
+  <br><em>Figure 4 — Estimated (simulated) causal ROI with 95% CI vs counterfactual ROI (simulated ground truth): every channel looks excellent; the truth says email/search profit and social/display destroy value.</em>
+</p>
+
 ## 12. Finding 3 — budget allocation via counterfactual scenarios
 
 Fixed budget = the as-run spend (**R$ 77,215**). Four allocations re-split the same budget (as_run / naive / causal / ctf_guided); per-channel treated capped at the cohort (94,983) with extrapolation flags; scenario totals carry an estimated-scale 95% CI (the honest gap between estimated and truth is the Days 8–16 bias in money terms).
@@ -165,6 +185,11 @@ Fixed budget = the as-run spend (**R$ 77,215**). Four allocations re-split the s
 
 Read: **any re-split beats the as-run scatter**, but no observed-data rule reaches the optimum (fund email to saturation ≈ R$ 9,498 spend, then search; never social/display) — because every estimate is inflated and keeps funding loss-making channels. The naive ranking "wins" partly via an extrapolation/saturation artifact, reported not gated. Full tables: `results/counterfactuals/`; report: `reports/counterfactuals.md`.
 
+<p align="center">
+  <img src="results/figures/readme_scenarios.png" alt="Budget scenario nets on the fixed R$ 77,215 budget" width="85%">
+  <br><em>Figure 5 — Scenario nets (R$) on the fixed budget. Estimated-scale 95% CIs (annotated) sit far above the truth-scale nets — that gap is the Days 8–16 bias in money terms (ADR-025).</em>
+</p>
+
 ## 13. Finding 4 — sensitivity: how strong must the unmeasured confounder be?
 
 Day 18 (report: `reports/sensitivity.md`; tables: `results/sensitivity/`), two tools plus falsification:
@@ -175,6 +200,11 @@ Day 18 (report: `reports/sensitivity.md`; tables: `results/sensitivity/`), two t
 
 Together: the observed positive lift is **not robustly causal**; a moderate unmeasured confounder of the kind this simulation actually contains explains essentially all of it.
 
+<p align="center">
+  <img src="results/figures/readme_evalue.png" alt="E-value per channel: fragility of the observed lift" width="85%">
+  <br><em>Figure 6 — E-values (point + CI-lower): a confounder at RR ≈ 1.7 on both axes fully explains away every observed channel effect.</em>
+</p>
+
 ## 14. Heterogeneity — CATE, uplift, and segments (know *who* responds)
 
 - **CATE meta-learners (T/X/S, Day 13):** all 8 channel × outcome cells pass learner-agreement gates, but individual-level rank agreement is weak (Spearman 0.32–0.77) — observed-X heterogeneity signal is tiny because `sim_u` dominates. Reported, not hidden.
@@ -182,6 +212,11 @@ Together: the observed positive lift is **not robustly causal**; a moderate unme
 - **Segments (Day 15):** 5 CATE bands per channel × outcome + Run/Skip/No-budget guidance. Every *estimated* CATE is positive in every band (the shared-bias demonstration); the counterfactual oracle shows email/search +, social −, display 0 — the observed data cannot recover even the sign.
 
 Segmentation guidance is **per-channel**, model-based, and counterfactual-informed — never "this individual customer causes revenue."
+
+<p align="center">
+  <img src="results/figures/readme_qini_email.png" alt="Email Qini curves: estimated uplift ranking vs oracle true lift" width="80%">
+  <br><em>Figure 7 — Email Qini: the observed-X uplift curve ranks the confounded signal, not the true incremental lift (simulated truth).</em>
+</p>
 
 ## 15. Causal-identification notebook (per channel)
 
@@ -212,6 +247,8 @@ All logic lives in pure builders (`src/dashboard/builders.py`); the app/pages ar
 - **Fixed seed `42`** for every simulation/model/bootstrap → identical renders and results.
 - **Results-only dashboard:** the app reads precomputed CSVs, so a fresh run reproduces the same `results/` → same dashboard.
 - **Test gate:** `pytest` from repo root — 368 tests, all green (env gate, data schema, ground-truth recovery on a small synthetic DGP, per-day gates, dashboard renders, deliverables manifest).
+- **README gallery:** every figure in this README is regenerated deterministically by `scripts/export_readme_figures.py` (matplotlib over `results/`, no new dependencies) and covered by the deliverables manifest (`tests/test_artifacts.py`).
+- **Language stats:** `results/figures/*.html` (plotly), raster exports, result tables, and notebooks are marked `linguist-generated` in `.gitattributes` — the repo's GitHub language bar reflects the actual Python source, not the 245 MB of committed plotly HTML.
 
 ## 19. Testing & quality gates
 
@@ -237,9 +274,12 @@ pip install -r requirements.lock.txt
 # 2. database (MySQL 8 running)
 #    create olist DB + olist_app user; copy .env.example -> .env; fill credentials
 
-# 3. data + pipeline (Day-by-day; see docs/roadmap.md for order)
-python -X utf8 sql/load.sql                            # (via mysql client; schema.sql first)
-python -X utf8 simulation/simulate_marketing.py        # sim_* treatment layer
+# 3. data + simulation (loaders execute sql/schema.sql + bulk load; analytics views in sql/analytics)
+python -X utf8 -m src.data.download_olist              # CSVs -> data/raw
+python -X utf8 -m src.data.load_olist                  # schema + load into the MySQL olist DB
+python -X utf8 -m src.data.build_analytical             # customer analytical table
+python -X utf8 -m src.data.build_order_monthly          # monthly aggregates
+python -X utf8 simulation/simulate_marketing.py         # sim_* treatment layer + sim_u
 
 # 4. tests
 pytest                                                 # 368 tests, from repo root

@@ -72,6 +72,10 @@ MANIFEST: dict[str, list[str]] = {
         "uplift_segments_conversion.html", "target_bands_conversion.html",
         "roi_comparison.html", "counterfactual_scenarios.html",
         "evalue.html", "bias_decomposition.html",
+        # README gallery (scripts/export_readme_figures.py)
+        "readme_dag_email.png", "readme_convergence_revenue.png",
+        "readme_roi.png", "readme_scenarios.png", "readme_evalue.png",
+        "readme_qini_email.png",
     ],
 }
 

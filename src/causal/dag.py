@@ -91,12 +91,17 @@ def get_backdoor_paths(channel: Literal["email", "social", "search", "display"],
     return estimand.backdoor_variables
 
 
-def render_dag_plotly(
+def build_dag_graph(
     channel: Literal["email", "social", "search", "display"],
     cfg: dict | None = None,
-    output_dir: Path | None = None,
-) -> tuple[go.Figure, Path]:
-    """Render the DAG as an interactive Plotly figure using networkx layout."""
+) -> nx.DiGraph:
+    """Construct the per-channel causal DAG as a networkx DiGraph (single source of truth).
+
+    Nodes carry a ``label`` (display text) and ``role`` (treatment / outcome /
+    confounder / unobserved_confounder / mediator / collider). Used by
+    :func:`render_dag_plotly` (Day 5) and by the README PNG export script, so
+    the interactive and static renderings can never drift apart.
+    """
     cfg = cfg or load_config()
     adj = adjustment_sets(cfg)
     confounders = adj[channel]
@@ -136,6 +141,20 @@ def render_dag_plotly(
     for ch in CHANNELS:
         if ch != channel:
             G.add_edge(f"sim_exposed_{ch}", "CoExposure")
+    return G
+
+
+def render_dag_plotly(
+    channel: Literal["email", "social", "search", "display"],
+    cfg: dict | None = None,
+    output_dir: Path | None = None,
+) -> tuple[go.Figure, Path]:
+    """Render the DAG as an interactive Plotly figure using networkx layout."""
+    cfg = cfg or load_config()
+    adj = adjustment_sets(cfg)
+    confounders = adj[channel]
+
+    G = build_dag_graph(channel, cfg)
 
     # Layout using spring_layout with manual positioning for clean DAG (no graphviz/pygraphviz)
     pos = nx.spring_layout(G, k=2.5, iterations=200, seed=42)
