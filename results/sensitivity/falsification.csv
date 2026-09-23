@@ -1,0 +1,6 @@
+test,label,estimate,scale,effect_sd_units,t_stat,p_value,falsified
+placebo outcome sim_u | channel email,simulated placebo (falsification test),0.6613111886824026,mean difference in sim_u,0.6916429163874693,97.56802652877829,0.0,True
+placebo outcome sim_u | channel social,simulated placebo (falsification test),0.6727000153506957,mean difference in sim_u,0.7018153210693763,94.8874719631671,0.0,True
+placebo outcome sim_u | channel search,simulated placebo (falsification test),0.6786898484479086,mean difference in sim_u,0.7140330297863685,103.75013678677105,0.0,True
+placebo outcome sim_u | channel display,simulated placebo (falsification test),0.6985924052598123,mean difference in sim_u,0.739820469163005,110.2897972480778,0.0,True
+placebo channel display (true effect 0),simulated placebo (falsification test),16.165542838120956,R$ per treated (DR),0.1977079124066991,27.517167555971074,1.094122328773796e-166,True

@@ -1,0 +1,8 @@
+gate,scope,value,threshold,passed,detail
+evalue_reported,all channels,1.0,1.0,True,"point + CI-lower E-values finite, > 1, and CI EV <= point EV for every channel"
+evalue_fragility_documented,point E-values,1.748,3.0,True,"max point E-value in (1, max_point_evalue]: the estimates are NOT robust - a modest unmeasured confounder suffices"
+bias_formula_explains_most,all channels,0.816,0.7,True,linear bias formula delta_U * gamma_U reproduces >= share_explained_min of every observed bias
+actual_u_is_real_confounder,all channels,0.692,0.5,True,measured treated/untreated difference in sim_u >= actual_u_min_delta SD units per channel
+placebo_tests_falsified,placebo outcome + placebo channel,27.52,1.96,True,"both falsification tests show |t| >= min_placebo_t: bias is detectable, not estimator luck"
+uncertainty_reported,all channels,1.0,1.0,True,DR rows carry SE/CI/n from the Day-12 master table (E-values derived from point AND ci_lower)
+labels_correct,all output rows,1.0,1.0,True,estimated / simulated truth / simulated measured / simulated placebo labels as required

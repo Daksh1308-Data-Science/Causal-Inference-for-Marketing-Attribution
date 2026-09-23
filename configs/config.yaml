@@ -18,6 +18,7 @@ results:
   target_segments: target_segments  # results/target_segments (Day 15)
   roi: roi                          # results/roi (Day 16)
   counterfactuals: counterfactuals  # results/counterfactuals (Day 17)
+  sensitivity: sensitivity          # results/sensitivity (Day 18)
 
 # --- Reproducibility ---
 seed: 42
@@ -107,6 +108,24 @@ counterfactuals:
                                   #       (the observed spend scatter is worse than any re-split)
   optimum_min_margin: 0.0         # hook: max scenario total net <= the budget-constrained linear
                                   #       optimum (greedy email-then-search, positive channels only)
+
+# --- Sensitivity analysis (Day 18): "how strong must U be?" ---
+# Question: how strong an unmeasured confounder would be needed to explain away
+# (or drive down to the sim truth) the Day-12 DR revenue ATEs. Two tools:
+# (a) VanderWeele-Ding E-value on the continuous scale via standardized mean
+#     difference; (b) linear bias formula bias = delta_U * gamma_U, where
+#     delta_U = standardized difference of U between treated/untreated and
+#     gamma_U = per-SD effect of U on the outcome. The simulated U is measured
+#     directly (simulation-only) and compared to what the bounds require.
+sensitivity:
+  d_to_rr_coef: 0.91            # continuous-outcome E-value approx: RR* = exp(coef*d)
+  share_explained_min: 0.70     # gate: linear bias formula must reproduce >= 70% of the
+                                #       observed bias per channel (bias_formula_explains_most)
+  max_point_evalue: 3.0         # gate: point E-values must lie strictly in (1, max] — i.e. the
+                                #       estimates are NOT robust; a modest confounder suffices
+  min_placebo_t: 1.96           # gate: falsification tests must show |t| >= this (2-sided 5%)
+  actual_u_min_delta: 0.50      # gate: measured treated/untreated difference in U (SD units)
+                                #       must exceed this for every channel (U is a real confounder)
 
 # --- Simulated marketing layer (design: docs/data-feasibility.md §4) ---
 # Day 3 ships a clearly-labeled PREVIEW of the layer so channel descriptive

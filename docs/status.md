@@ -2,7 +2,7 @@
 
 Updated at the end of every day. Mirrors `docs/roadmap.md`.
 
-Last updated: **Day 17 — complete** (2026-09-22; Week 3 in progress)
+Last updated: **Day 18 — complete** (2026-09-23; Week 3 in progress)
 
 ## Current state
 
@@ -11,7 +11,7 @@ Last updated: **Day 17 — complete** (2026-09-22; Week 3 in progress)
 | Governance docs | ✅ Done (Day 0) |
 | Week 1 — Data + Causal framework (Days 1–7) | ✅ Complete (Gate 1 validated) |
 | Week 2 — Treatment effect estimation (Days 8–14) | ✅ Complete (Gate 2 validated) |
-| Week 3 — Business + robustness + product (Days 15–21) | 🟡 Day 17 complete; Day 18 (sensitivity) next → Gate 3 after Day 21 |
+| Week 3 — Business + robustness + product (Days 15–21) | 🟡 Day 18 complete; Day 19 (dashboard) next → Gate 3 after Day 21 |
 
 ## Completed
 
@@ -216,11 +216,24 @@ Last updated: **Day 17 — complete** (2026-09-22; Week 3 in progress)
 - [x] `tests/test_counterfactuals.py` — 15 tests: schema/labels, spends sum to budget, as_run↔Day-16 consistency, ranking/purity (as_run last, monotonic), email saturation + zero-spend ctf_guided cells, bounded-by-optimum, CI columns + bias-gap magnitude, gates pass, **gate non-vacuity** (naive inflated past optimum ⇒ bounded_by_optimum fails; email un-flagged ⇒ saturation gate fails; causal deflated below as_run ⇒ realloc gate fails; CI bounds inverted ⇒ uncertainty gate fails), determinism, artifacts + report content, no literal escapes
 - [x] **Full suite: 240/240 tests pass** (225 + 15 counterfactuals). **Day 17 validation hook green — Week 3 in progress.**
 
+### Day 18 — Sensitivity: how strong must U be? ✅
+- [x] `configs/config.yaml`: `sensitivity:` block — `d_to_rr_coef` (0.91), gate thresholds (`share_explained_min`, `max_point_evalue`, `min_placebo_t`, `actual_u_min_delta`) + `results.sensitivity` path
+- [x] `src/causal/sensitivity.py` — the roadmap "Each claim stress-tested" hook on the Day-12 DR revenue ATEs:
+  - **E-value (VanderWeele & Ding 2017, continuous-outcome approx):** d = ATE/SD(rev); RR* = exp(0.91·d); E-value = RR* + √(RR*·(RR*−1)); reported for the point AND the CI-lower bound. Every row labeled (estimated / simulated ground truth / simulated measured / simulated placebo)
+  - **Linear bias formula:** bias = δ_U·γ_U with δ_U = standardized treated/untreated difference in `sim_u`, γ_U = per-SD effect of `sim_u` on revenue (both measured directly from the DGP, simulation-only); required δ to zero the estimate and to reach the truth compared with the actual δ
+  - **Falsification tests:** placebo outcome `sim_u` (treatment cannot affect it) — every channel shows ≈0.7-SD hugely significant "effects" (|t| ≈ 95–110); placebo channel display (true effect 0) shows R$ 16.17 with |t| = 27.5 — both placebos fail loudly, which IS the evidence
+  - **Cross-estimator stress:** Days 9–12 convergence (naive≈OLS≈IPW≈DR≈ATT≈backdoor) shown tiny relative to the bias; bounds, not another estimator, are the stress test
+- [x] **Results:** E-value 1.68–1.75 per channel (point) / 1.64–1.71 (CI-lower) — **fragile**: a moderate unmeasured confounder (RR ≈ 1.71 on BOTH axes) fully explains the estimates. Bias formula reproduces **82–97%** of every observed bias (email 95% / search 97% / display 94% / social 82% — residual = DGP nonlinearity); measured δ_U = 0.69–0.74 SD vs required-to-truth 0.73–0.86
+- [x] `results/sensitivity/{evalue,bias_formula,falsification,gates}.csv`, `results/figures/{evalue,bias_decomposition}.html`, `reports/sensitivity.md`
+- [x] **Validation hooks — all 7 gates green:** evalue_reported, evalue_fragility_documented (max 1.75 ≤ 3.0), bias_formula_explains_most (min 0.82 ≥ 0.70), actual_u_is_real_confounder (min δ 0.69 ≥ 0.50), placebo_tests_falsified (|t| min 27.5 ≥ 1.96), uncertainty_reported, labels_correct
+- [x] `tests/test_sensitivity.py` — 14 tests: schema/labels, E-value ordering+fragility band+RR-approx identity, bias-formula consistency (share ≡ δ·γ/bias), confounder magnitude, placebo falsification, display-placebo |t| ≡ point/se, gates pass, **gate non-vacuity** (E-value inflated ⇒ fragility gate fails; δ weakened ⇒ actual-U gate fails; δ crushed ⇒ formula gate fails; placebo neutralised ⇒ placebo gate fails), determinism, artifacts + report content, no literal escapes
+- [x] **Full suite: 254/254 tests pass** (240 + 14 sensitivity). **Day 18 validation hook green — Week 3 in progress.**
+
 ## Blockers
 
 None.
 
 ## Next actions
 
-1. Week 3 in progress (Gate 2 approved): Day 18 (sensitivity — "how strong must U be?"), Day 19 (Streamlit dashboard), Day 20 (tests + polish), Day 21 (README + `v1.0`) → **Gate 3 (final validation)**.
-2. Emerging storyline (Days 8–17): naive ≈ OLS ≈ IPW ≈ DR ≈ ATT ≈ mean-CATE because `sim_u` dominates. Day 16 quantified the money consequence — even causal ROI is positive for every channel (≈1,100%–17,000%) vs the counterfactual truth (email/search profitable; social/display −299%/−100%). Day 17 turned it into budget what-ifs on a fixed R$ 77,215 budget: any reallocation beats the as-run scatter (48→≥148k), email saturates at R$ 9,498, and no observed-data rule reaches the R$ 288,438 budget-constrained optimum because all estimators are sim_u-inflated. Day 18 bounds how strong `sim_u` must be (E-value / bias formula); Days 19–21 productize.
+1. Week 3 in progress (Gate 2 approved): Day 19 (Streamlit dashboard), Day 20 (tests + polish), Day 21 (README + `v1.0`) → **Gate 3 (final validation)**.
+2. Emerging storyline (Days 8–18): naive ≈ OLS ≈ IPW ≈ DR ≈ ATT ≈ mean-CATE because `sim_u` dominates. Day 16 quantified the money consequence — even causal ROI is positive for every channel (≈1,100%–17,000%) vs the counterfactual truth (email/search profitable; social/display −299%/−100%). Day 17 turned it into budget what-ifs on a fixed R$ 77,215 budget: any reallocation beats the as-run scatter (48→≥148k), email saturates at R$ 9,498, and no observed-data rule reaches the R$ 288,438 budget-constrained optimum. Day 18 closed the loop: an unmeasured confounder with RR ≈ 1.71 on both axes explains the whole spurious effect (E-value), the actual `sim_u` (δ ≈ 0.69–0.74 SD, γ = R$ 20.5/SD) reproduces 82–97% of every observed bias, and both placebos fail loudly. Days 19–21 productize.
