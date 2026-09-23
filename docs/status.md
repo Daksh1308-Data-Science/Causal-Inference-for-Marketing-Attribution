@@ -2,7 +2,7 @@
 
 Updated at the end of every day. Mirrors `docs/roadmap.md`.
 
-Last updated: **Day 18 — complete** (2026-09-23; Week 3 in progress)
+Last updated: **Day 19 — complete** (2026-09-23; Week 3 in progress)
 
 ## Current state
 
@@ -11,7 +11,7 @@ Last updated: **Day 18 — complete** (2026-09-23; Week 3 in progress)
 | Governance docs | ✅ Done (Day 0) |
 | Week 1 — Data + Causal framework (Days 1–7) | ✅ Complete (Gate 1 validated) |
 | Week 2 — Treatment effect estimation (Days 8–14) | ✅ Complete (Gate 2 validated) |
-| Week 3 — Business + robustness + product (Days 15–21) | 🟡 Day 18 complete; Day 19 (dashboard) next → Gate 3 after Day 21 |
+| Week 3 — Business + robustness + product (Days 15–21) | 🟡 Day 19 complete; Day 20 (tests + hardening) next → Gate 3 after Day 21 |
 
 ## Completed
 
@@ -229,11 +229,21 @@ Last updated: **Day 18 — complete** (2026-09-23; Week 3 in progress)
 - [x] `tests/test_sensitivity.py` — 14 tests: schema/labels, E-value ordering+fragility band+RR-approx identity, bias-formula consistency (share ≡ δ·γ/bias), confounder magnitude, placebo falsification, display-placebo |t| ≡ point/se, gates pass, **gate non-vacuity** (E-value inflated ⇒ fragility gate fails; δ weakened ⇒ actual-U gate fails; δ crushed ⇒ formula gate fails; placebo neutralised ⇒ placebo gate fails), determinism, artifacts + report content, no literal escapes
 - [x] **Full suite: 254/254 tests pass** (240 + 14 sensitivity). **Day 18 validation hook green — Week 3 in progress.**
 
+### Day 19 — Streamlit dashboard (honest framing inside the product) ✅
+- [x] `configs/config.yaml`: `results.dashboard` path note (dashboard reads `results/` only — no new tunables; builders are wired to precomputed CSVs, never recompute in the app)
+- [x] `src/dashboard/builders.py` — pure, headless-testable page builders (all logic; the Streamlit pages are thin glue):
+  - **7 pages, one builder each** (`PAGE_BUILDERS`): exec, dag, attribution, uplift, simulator, sensitivity, diagnostics — every one returns `tokens` and renders through `load_config()` from `results/` only
+  - **Honest vocabulary single-source:** `LABEL_ESTIMATED / LABEL_MEASURED / LABEL_PLACEBO / LABEL_TRUTH` identity-imported from `src/causal/sensitivity.py` (never re-declared); every page carries the shared `HONEST_TOKEN` framing — observed lift is confounder-compatible and **fragile** (E-values 1.68–1.75), **NOT established causal**; sim_/DGP-oracle markers everywhere
+  - CI on every effect (attribution `inc_rev_ci_low/high`, diagnostics `ci_lower/ci_upper`); `render_gate()` checks non-vacuity per page (missing `results/` ⇒ raises)
+- [x] `dashboard/app.py` + `dashboard/pages/2_DAG…7_Diagnostics.py` — thin Streamlit glue, each boots repo root into `sys.path` and calls the pure builders
+- [x] `tests/test_dashboard.py` — 28 tests: per-page **headless AppTest** (no exception + `HONEST_TOKEN` verbatim on every page across all element types), builder contract keys + honest tokens, **label identity** (builders reuse sensitivity vocabulary, not re-declared), CI columns present and ordered, `render_gate` passes 7/7 + **non-vacuity** (missing results trips the gate), determinism (identical render twice), `run_all`
+- [x] **Full suite: 282/282 tests pass** (254 + 28 dashboard). **Day 19 validation hook green — Week 3 in progress.**
+
 ## Blockers
 
 None.
 
 ## Next actions
 
-1. Week 3 in progress (Gate 2 approved): Day 19 (Streamlit dashboard), Day 20 (tests + polish), Day 21 (README + `v1.0`) → **Gate 3 (final validation)**.
-2. Emerging storyline (Days 8–18): naive ≈ OLS ≈ IPW ≈ DR ≈ ATT ≈ mean-CATE because `sim_u` dominates. Day 16 quantified the money consequence — even causal ROI is positive for every channel (≈1,100%–17,000%) vs the counterfactual truth (email/search profitable; social/display −299%/−100%). Day 17 turned it into budget what-ifs on a fixed R$ 77,215 budget: any reallocation beats the as-run scatter (48→≥148k), email saturates at R$ 9,498, and no observed-data rule reaches the R$ 288,438 budget-constrained optimum. Day 18 closed the loop: an unmeasured confounder with RR ≈ 1.71 on both axes explains the whole spurious effect (E-value), the actual `sim_u` (δ ≈ 0.69–0.74 SD, γ = R$ 20.5/SD) reproduces 82–97% of every observed bias, and both placebos fail loudly. Days 19–21 productize.
+1. Week 3 in progress (Gate 2 approved): Day 19 (Streamlit dashboard) ✅, Day 20 (tests + polish), Day 21 (README + `v1.0`) → **Gate 3 (final validation)**.
+2. Emerging storyline (Days 8–18): naive ≈ OLS ≈ IPW ≈ DR ≈ ATT ≈ mean-CATE because `sim_u` dominates. Day 16 quantified the money consequence — even causal ROI is positive for every channel (≈1,100%–17,000%) vs the counterfactual truth (email/search profitable; social/display −299%/−100%). Day 17 turned it into budget what-ifs on a fixed R$ 77,215 budget: any reallocation beats the as-run scatter (48→≥148k), email saturates at R$ 9,498, and no observed-data rule reaches the R$ 288,438 budget-constrained optimum. Day 18 closed the loop: an unmeasured confounder with RR ≈ 1.71 on both axes explains the whole spurious effect (E-value), the actual `sim_u` (δ ≈ 0.69–0.74 SD, γ = R$ 20.5/SD) reproduces 82–97% of every observed bias, and both placebos fail loudly. Day 19 productized it: the 7-page dashboard carries the honest framing on every page (single-source `HONEST_TOKEN`), renders headless-clean, and passed 282/282. Days 20–21 finish the product.

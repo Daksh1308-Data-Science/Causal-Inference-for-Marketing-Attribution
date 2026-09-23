@@ -19,6 +19,7 @@ results:
   roi: roi                          # results/roi (Day 16)
   counterfactuals: counterfactuals  # results/counterfactuals (Day 17)
   sensitivity: sensitivity          # results/sensitivity (Day 18)
+  dashboard: dashboard              # results/dashboard (Day 19)
 
 # --- Reproducibility ---
 seed: 42

@@ -46,7 +46,7 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 | 16 | ROI | Cost assumptions in config; observational vs causal ROI table | `reports/roi` | ROI complete per channel | `Day 16: incremental ROI` | ✅ |
 | 17 | Counterfactuals | Scenarios A–D simulator + bootstrap uncertainty + extrapolation limits | `results/counterfactuals` | Uncertainty reported; limits stated | `Day 17: counterfactual simulator` | ✅ |
 | 18 | Sensitivity | E-value, bias formula, placebo tests, alt adjustment sets/estimators; "how strong must U be?" | `reports/sensitivity` | Each claim stress-tested | `Day 18: sensitivity analysis` | ✅ |
-| 19 | Dashboard | 7-page Streamlit wired to `results/` | `dashboard/` app | All pages render | `Day 19: Streamlit dashboard` | ⬜ |
+| 19 | Dashboard | 7-page Streamlit wired to `results/` | `dashboard/` app | All pages render | `Day 19: Streamlit dashboard` | ✅ |
 | 20 | Tests + polish | pytest suite (env gate, schema, ground-truth recovery, dashboard data); config; docs | Green test suite | `pytest` passes | `Day 20: tests + hardening` | ⬜ |
 | 21 | Docs + portfolio | 25-section README, exec summary, 30s/2min/5min pitch, interview Q&A | `reports/` + README | Install→results reproducible | `Day 21: README + v1.0` | ⬜ |
 
@@ -56,9 +56,9 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 
 ## Progress summary (updated after every day)
 
-- **Completed:** Day 0, Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7, Day 8, Day 9, Day 10, Day 11, Day 12, Day 13, Day 14, Day 15, Day 16, Day 17, Day 18
-- **In progress:** Day 19 (Streamlit dashboard)
-- **Next up:** Day 19 — Streamlit dashboard over the precomputed `results/` (roadmap hook "Dashboard renders; labels correct")
+- **Completed:** Day 0, Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7, Day 8, Day 9, Day 10, Day 11, Day 12, Day 13, Day 14, Day 15, Day 16, Day 17, Day 18, Day 19
+- **In progress:** Day 20 (tests + polish)
+- **Next up:** Day 20 — pytest suite + config polish after the Day-19 dashboard (roadmap hook "Dashboard renders; labels correct" ✅)
 - **Blockers:** none
 
 > ✅ Day 2 validation hook green: 50/50 tests pass (25 env gate + 25 data schema/cohort/RFM), cohort = 94,983, no dupes, RFM plausible. See `docs/status.md`.
@@ -94,3 +94,5 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 > ✅ Day 17 validation hook green: counterfactual scenarios — 15 tests pass; budget what-ifs on a fixed R$ 77,215 budget (as_run / naive / causal / ctf_guided), extrapolation flags where implied treated exceeds the observed range, estimated-scale 95% CI propagated through the linear scenario transform from the Day-12 DR revenue ATE CIs; all 8 gates green, incl. cross-day consistency (as_run reproduces Day-16 cohort nets) and the honest finding: any reallocation beats the as-run scatter (min R$ 147,922 vs 48,084) but the naive spread tops the ranking via an email-saturation artifact (email saturates at R$ 9,498; wider spreads waste less), no scenario reaches the R$ 288,438 budget-constrained optimum — observed-data rules still fund sim_u-inflated channels (counterfactual net = 2.7–10.3% of the estimated CI lower bound, ≈10–38× overstatement); full suite 240/240. See `docs/status.md`.
 
 > ✅ Day 18 validation hook green: sensitivity ("Each claim stress-tested") — 14 tests pass; E-value (VanderWeele–Ding, continuous-outcome approx) 1.68–1.75 point / 1.64–1.71 CI-lower per channel — fragile, a confounder with per-~SD RR ≈ 1.71 on BOTH axes explains the estimates away; linear bias formula bias = δ_U·γ_U (γ_U = R$ 20.5/SD measured) reproduces 82–97% of every observed bias, measured δ_U ≈ 0.69–0.74 SD vs required-to-truth 0.73–0.86; both placebo tests fail loudly (sim_u outcome |t| ≈ 95–110; display channel |t| = 27.5); all 7 gates green, full suite 254/254. See `docs/status.md`.
+
+> ✅ Day 19 validation hook green: dashboard ("Dashboard renders; labels correct") — 28 tests pass; 7-page Streamlit app, all pages pure-builder + thin glue; every page renders headless (AppTest) with the single-source `HONEST_TOKEN` framing verbatim (observed lift confounder-compatible & fragile — **NOT established causal**; sim_/DGP-oracle markers); honest vocab identity-imported from `src/causal/sensitivity.py` (never re-declared); CI columns on every effect; `render_gate` 7/7 + non-vacuity (missing results ⇒ FileNotFoundError); no `results/figures` churn committed; full suite 282/282. See `docs/status.md`.
