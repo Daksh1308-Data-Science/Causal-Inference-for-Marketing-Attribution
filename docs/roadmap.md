@@ -50,15 +50,15 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 | 20 | Tests + polish | pytest suite (env gate, schema, ground-truth recovery, dashboard data); config; docs | Green test suite | `pytest` passes | `Day 20: tests + hardening` | ✅ |
 | 21 | Docs + portfolio | 25-section README, exec summary, 30s/2min/5min pitch, interview Q&A | `reports/` + README | Install→results reproducible | `Day 21: README + v1.0` | ✅ |
 
-**🏁 Gate 3 — final validation → tag `v1.0`.**
+**🏁 Gate 3 — final validation ✅ (2026-09-23) → tag `v1.0` ✅ (pushed).**
 
 ---
 
 ## Progress summary (updated after every day)
 
 - **Completed:** Day 0, Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7, Day 8, Day 9, Day 10, Day 11, Day 12, Day 13, Day 14, Day 15, Day 16, Day 17, Day 18, Day 19, Day 20, Day 21
-- **In progress:** **Gate 3 — final human validation → tag `v1.0`**
-- **Next up:** none — all 21 days complete; tag `v1.0` after Gate 3 approval
+- **In progress:** none — **project complete**
+- **Release:** **Gate 3 validated by human (2026-09-23) → `v1.0` tagged & pushed** (annotated tag on `43998e9`)
 - **Blockers:** none
 
 > ✅ Day 2 validation hook green: 50/50 tests pass (25 env gate + 25 data schema/cohort/RFM), cohort = 94,983, no dupes, RFM plausible. See `docs/status.md`.
@@ -99,4 +99,4 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 
 > ✅ Day 20 validation hook green: tests + hardening — 86 tests pass; deliverables manifest wraps the whole build (`results/` + `reports/`, resolved through config): every artifact exists non-empty; key-table schemas with CI ordering (`roi_summary` causal CI brackets the point; `scenario_summary` estimated-scale CIs sit above the truth-scale net — the honest 10–38× overstatement visible in the artifact); all artifact `gates.csv` records report passed with measured values; static scan proves the 9 dashboard data reads are manifest-covered and on disk; every result `label` column uses honest roots and no report claims a channel "causes" an outcome; full suite 367/367. See `docs/status.md`.
 
-> ✅ Day 21 validation hook green: docs + portfolio — 25-section README (every number cross-checked against `results/*.csv`), CMO exec summary, 30s/2min/5min pitches, 10-question interview Q&A; portfolio docs added to the deliverables manifest and scanned for unnegated causal claims (regex now permits the honest "NOT established causal" negation); final full-suite re-run green on the packaged state; figure churn reverted; commit `Day 21: README + v1.0` pushed. **All 21 days complete — STOPPED at Gate 3 for final human validation; `v1.0` tag pending approval.** See `docs/status.md`.
+> ✅ Day 21 validation hook green: docs + portfolio — 25-section README (every number cross-checked against `results/*.csv`), CMO exec summary, 30s/2min/5min pitches, 10-question interview Q&A; portfolio docs added to the deliverables manifest and scanned for unnegated causal claims (regex now permits the honest "NOT established causal" negation); final full-suite re-run green on the packaged state (368/368); figure churn reverted; commit `Day 21: README + v1.0` pushed. **All 21 days complete; Gate 3 validated by the human (2026-09-23) and release tag `v1.0` created and pushed (annotated, commit `43998e9`). PROJECT COMPLETE.** See `docs/status.md`.

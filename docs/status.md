@@ -2,7 +2,7 @@
 
 Updated at the end of every day. Mirrors `docs/roadmap.md`.
 
-Last updated: **Day 21 — complete** (2026-09-23; Week 3 in progress)
+Last updated: **Day 21 — complete · Gate 3 approved · `v1.0` tagged** (2026-09-23)
 
 ## Current state
 
@@ -11,7 +11,8 @@ Last updated: **Day 21 — complete** (2026-09-23; Week 3 in progress)
 | Governance docs | ✅ Done (Day 0) |
 | Week 1 — Data + Causal framework (Days 1–7) | ✅ Complete (Gate 1 validated) |
 | Week 2 — Treatment effect estimation (Days 8–14) | ✅ Complete (Gate 2 validated) |
-| Week 3 — Business + robustness + product (Days 15–21) | ✅ All 21 days complete — **awaiting Gate 3 (final human validation) → tag `v1.0`** |
+| Week 3 — Business + robustness + product (Days 15–21) | ✅ Complete (**Gate 3 validated by human on 2026-09-23**) |
+| Release | ✅ **`v1.0` tagged and pushed** (annotated tag on `43998e9`) |
 
 ## Completed
 
@@ -262,5 +263,5 @@ None.
 
 ## Next actions
 
-1. **All 21 roadmap days complete.** Gate 3 (final human validation) pending → on approval, tag `v1.0` and push the tag. See `README.md` §25 and `docs/roadmap.md` for the packaging recap.
+1. **Complete.** All 21 roadmap days done; **Gate 3 validated by the human on 2026-09-23; release tag `v1.0` created and pushed** (annotated, on commit `43998e9`). Repository: `https://github.com/Daksh1308-Data-Science/Causal-Inference-for-Marketing-Attribution`.
 2. Emerging storyline (Days 8–18): naive ≈ OLS ≈ IPW ≈ DR ≈ ATT ≈ mean-CATE because `sim_u` dominates. Day 16 quantified the money consequence — even causal ROI is positive for every channel (≈1,100%–17,000%) vs the counterfactual truth (email/search profitable; social/display −299%/−100%). Day 17 turned it into budget what-ifs on a fixed R$ 77,215 budget: any reallocation beats the as-run scatter (48→≥148k), email saturates at R$ 9,498, and no observed-data rule reaches the R$ 288,438 budget-constrained optimum. Day 18 closed the loop: an unmeasured confounder with RR ≈ 1.71 on both axes explains the whole spurious effect (E-value), the actual `sim_u` (δ ≈ 0.69–0.74 SD, γ = R$ 20.5/SD) reproduces 82–97% of every observed bias, and both placebos fail loudly. Day 19 productized it: the 7-page dashboard carries the honest framing on every page (single-source `HONEST_TOKEN`), renders headless-clean. Day 20 wrapped the whole build in a deliverables-manifest suite (86 tests: every artifact present + schemas + gate records green + honest labels everywhere), full suite 367/367. Day 21 packaged it: 25-section README, executive summary, pitches, interview Q&A, manifest-verified, full suite re-run green — the build is complete and **stopped at Gate 3 for final human validation**.
