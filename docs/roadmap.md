@@ -47,7 +47,7 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 | 17 | Counterfactuals | Scenarios A–D simulator + bootstrap uncertainty + extrapolation limits | `results/counterfactuals` | Uncertainty reported; limits stated | `Day 17: counterfactual simulator` | ✅ |
 | 18 | Sensitivity | E-value, bias formula, placebo tests, alt adjustment sets/estimators; "how strong must U be?" | `reports/sensitivity` | Each claim stress-tested | `Day 18: sensitivity analysis` | ✅ |
 | 19 | Dashboard | 7-page Streamlit wired to `results/` | `dashboard/` app | All pages render | `Day 19: Streamlit dashboard` | ✅ |
-| 20 | Tests + polish | pytest suite (env gate, schema, ground-truth recovery, dashboard data); config; docs | Green test suite | `pytest` passes | `Day 20: tests + hardening` | ⬜ |
+| 20 | Tests + polish | pytest suite (env gate, schema, ground-truth recovery, dashboard data); config; docs | Green test suite | `pytest` passes | `Day 20: tests + hardening` | ✅ |
 | 21 | Docs + portfolio | 25-section README, exec summary, 30s/2min/5min pitch, interview Q&A | `reports/` + README | Install→results reproducible | `Day 21: README + v1.0` | ⬜ |
 
 **🏁 Gate 3 — final validation → tag `v1.0`.**
@@ -56,9 +56,9 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 
 ## Progress summary (updated after every day)
 
-- **Completed:** Day 0, Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7, Day 8, Day 9, Day 10, Day 11, Day 12, Day 13, Day 14, Day 15, Day 16, Day 17, Day 18, Day 19
-- **In progress:** Day 20 (tests + polish)
-- **Next up:** Day 20 — pytest suite + config polish after the Day-19 dashboard (roadmap hook "Dashboard renders; labels correct" ✅)
+- **Completed:** Day 0, Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7, Day 8, Day 9, Day 10, Day 11, Day 12, Day 13, Day 14, Day 15, Day 16, Day 17, Day 18, Day 19, Day 20
+- **In progress:** Day 21 (README + `v1.0`)
+- **Next up:** Day 21 — 25-section README, exec summary, pitches, then **Gate 3 (final human validation)** → tag `v1.0`
 - **Blockers:** none
 
 > ✅ Day 2 validation hook green: 50/50 tests pass (25 env gate + 25 data schema/cohort/RFM), cohort = 94,983, no dupes, RFM plausible. See `docs/status.md`.
@@ -96,3 +96,5 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 > ✅ Day 18 validation hook green: sensitivity ("Each claim stress-tested") — 14 tests pass; E-value (VanderWeele–Ding, continuous-outcome approx) 1.68–1.75 point / 1.64–1.71 CI-lower per channel — fragile, a confounder with per-~SD RR ≈ 1.71 on BOTH axes explains the estimates away; linear bias formula bias = δ_U·γ_U (γ_U = R$ 20.5/SD measured) reproduces 82–97% of every observed bias, measured δ_U ≈ 0.69–0.74 SD vs required-to-truth 0.73–0.86; both placebo tests fail loudly (sim_u outcome |t| ≈ 95–110; display channel |t| = 27.5); all 7 gates green, full suite 254/254. See `docs/status.md`.
 
 > ✅ Day 19 validation hook green: dashboard ("Dashboard renders; labels correct") — 28 tests pass; 7-page Streamlit app, all pages pure-builder + thin glue; every page renders headless (AppTest) with the single-source `HONEST_TOKEN` framing verbatim (observed lift confounder-compatible & fragile — **NOT established causal**; sim_/DGP-oracle markers); honest vocab identity-imported from `src/causal/sensitivity.py` (never re-declared); CI columns on every effect; `render_gate` 7/7 + non-vacuity (missing results ⇒ FileNotFoundError); no `results/figures` churn committed; full suite 282/282. See `docs/status.md`.
+
+> ✅ Day 20 validation hook green: tests + hardening — 86 tests pass; deliverables manifest wraps the whole build (`results/` + `reports/`, resolved through config): every artifact exists non-empty; key-table schemas with CI ordering (`roi_summary` causal CI brackets the point; `scenario_summary` estimated-scale CIs sit above the truth-scale net — the honest 10–38× overstatement visible in the artifact); all artifact `gates.csv` records report passed with measured values; static scan proves the 9 dashboard data reads are manifest-covered and on disk; every result `label` column uses honest roots and no report claims a channel "causes" an outcome; full suite 367/367. See `docs/status.md`.

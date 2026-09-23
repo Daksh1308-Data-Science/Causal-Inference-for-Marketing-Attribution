@@ -2,7 +2,7 @@
 
 Updated at the end of every day. Mirrors `docs/roadmap.md`.
 
-Last updated: **Day 19 — complete** (2026-09-23; Week 3 in progress)
+Last updated: **Day 20 — complete** (2026-09-23; Week 3 in progress)
 
 ## Current state
 
@@ -11,7 +11,7 @@ Last updated: **Day 19 — complete** (2026-09-23; Week 3 in progress)
 | Governance docs | ✅ Done (Day 0) |
 | Week 1 — Data + Causal framework (Days 1–7) | ✅ Complete (Gate 1 validated) |
 | Week 2 — Treatment effect estimation (Days 8–14) | ✅ Complete (Gate 2 validated) |
-| Week 3 — Business + robustness + product (Days 15–21) | 🟡 Day 19 complete; Day 20 (tests + hardening) next → Gate 3 after Day 21 |
+| Week 3 — Business + robustness + product (Days 15–21) | 🟡 Day 20 complete; Day 21 (README + `v1.0`) next → Gate 3 after Day 21 |
 
 ## Completed
 
@@ -239,11 +239,20 @@ Last updated: **Day 19 — complete** (2026-09-23; Week 3 in progress)
 - [x] `tests/test_dashboard.py` — 28 tests: per-page **headless AppTest** (no exception + `HONEST_TOKEN` verbatim on every page across all element types), builder contract keys + honest tokens, **label identity** (builders reuse sensitivity vocabulary, not re-declared), CI columns present and ordered, `render_gate` passes 7/7 + **non-vacuity** (missing results trips the gate), determinism (identical render twice), `run_all`
 - [x] **Full suite: 282/282 tests pass** (254 + 28 dashboard). **Day 19 validation hook green — Week 3 in progress.**
 
+### Day 20 — Tests + hardening: deliverables manifest wraps the whole build ✅
+- [x] `tests/test_artifacts.py` — **86 tests**: the bundle-level acceptance gate ("Install→results reproducible", AGENTS.md §6 dashboard-data-presence at artifact scale):
+  - **Manifest presence** — every roadmapped artifact (`results/tables, figures, roi, counterfactuals, sensitivity, uplift, target_segments` + all 12 `reports/*.md`) exists and is non-empty; section dirs resolve through `configs/config.yaml` `results:` block (no hardcoded paths)
+  - **Schema contracts** — `master_estimates` (point/se/ci/n/label), `roi_summary` CI ordering (`causal_roi_ci_low ≤ causal_roi ≤ ci_high`), `evalue` CI columns; `scenario_summary` CIs are on the **estimated (Day-12 DR) scale and sit strictly above the truth-scale net** — the honest sim_u overstatement (10–38×, ADR-025) is visible in the artifact, not hidden
+  - **Gate records green** — every artifact `gates.csv` (roi 6 / counterfactuals 8 / sensitivity 7 / uplift 4 / target_segments 6) reports `passed == True` with measured values (deterministic records, not just in-code asserts)
+  - **Dashboard data contract** — static scan: every `_read`/`_maybe` CSV the Day-19 builders read exists on disk AND is in the manifest (9/9 pairs)
+  - **Honest vocabulary at bundle level** — every `label` column across all result CSVs uses the honest roots (estimated/simulated/placebo/counterfactual/naive/observed/measured) and never "established causal/caused by/…causes"; no channel-`causes` claim in any report (AGENTS.md §8 survives into prose)
+- [x] **Full suite: 367/367 tests pass** (282 + 85). **Day 20 validation hook green — Week 3 in progress.**
+
 ## Blockers
 
 None.
 
 ## Next actions
 
-1. Week 3 in progress (Gate 2 approved): Day 19 (Streamlit dashboard) ✅, Day 20 (tests + polish), Day 21 (README + `v1.0`) → **Gate 3 (final validation)**.
-2. Emerging storyline (Days 8–18): naive ≈ OLS ≈ IPW ≈ DR ≈ ATT ≈ mean-CATE because `sim_u` dominates. Day 16 quantified the money consequence — even causal ROI is positive for every channel (≈1,100%–17,000%) vs the counterfactual truth (email/search profitable; social/display −299%/−100%). Day 17 turned it into budget what-ifs on a fixed R$ 77,215 budget: any reallocation beats the as-run scatter (48→≥148k), email saturates at R$ 9,498, and no observed-data rule reaches the R$ 288,438 budget-constrained optimum. Day 18 closed the loop: an unmeasured confounder with RR ≈ 1.71 on both axes explains the whole spurious effect (E-value), the actual `sim_u` (δ ≈ 0.69–0.74 SD, γ = R$ 20.5/SD) reproduces 82–97% of every observed bias, and both placebos fail loudly. Day 19 productized it: the 7-page dashboard carries the honest framing on every page (single-source `HONEST_TOKEN`), renders headless-clean, and passed 282/282. Days 20–21 finish the product.
+1. Week 3 in progress (Gate 2 approved): Day 19 (Streamlit dashboard) ✅, Day 20 (tests + hardening) ✅, Day 21 (README + `v1.0`) next → **Gate 3 (final validation)**.
+2. Emerging storyline (Days 8–18): naive ≈ OLS ≈ IPW ≈ DR ≈ ATT ≈ mean-CATE because `sim_u` dominates. Day 16 quantified the money consequence — even causal ROI is positive for every channel (≈1,100%–17,000%) vs the counterfactual truth (email/search profitable; social/display −299%/−100%). Day 17 turned it into budget what-ifs on a fixed R$ 77,215 budget: any reallocation beats the as-run scatter (48→≥148k), email saturates at R$ 9,498, and no observed-data rule reaches the R$ 288,438 budget-constrained optimum. Day 18 closed the loop: an unmeasured confounder with RR ≈ 1.71 on both axes explains the whole spurious effect (E-value), the actual `sim_u` (δ ≈ 0.69–0.74 SD, γ = R$ 20.5/SD) reproduces 82–97% of every observed bias, and both placebos fail loudly. Day 19 productized it: the 7-page dashboard carries the honest framing on every page (single-source `HONEST_TOKEN`), renders headless-clean. Day 20 wrapped the whole build in a deliverables-manifest suite (86 tests: every artifact present + schemas + gate records green + honest labels everywhere), full suite 367/367. Day 21 finishes the product (README + `v1.0`), then **Gate 3**.
