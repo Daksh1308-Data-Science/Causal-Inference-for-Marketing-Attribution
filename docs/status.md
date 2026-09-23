@@ -2,7 +2,7 @@
 
 Updated at the end of every day. Mirrors `docs/roadmap.md`.
 
-Last updated: **Day 21 — complete · Gate 3 approved · `v1.0` tagged** (2026-09-23)
+Last updated: **Day 21 — complete · Gate 3 approved · `v1.0` tagged · post-release polish (`6898982`)** (2026-09-23)
 
 ## Current state
 
@@ -13,6 +13,14 @@ Last updated: **Day 21 — complete · Gate 3 approved · `v1.0` tagged** (2026-
 | Week 2 — Treatment effect estimation (Days 8–14) | ✅ Complete (Gate 2 validated) |
 | Week 3 — Business + robustness + product (Days 15–21) | ✅ Complete (**Gate 3 validated by human on 2026-09-23**) |
 | Release | ✅ **`v1.0` tagged and pushed** (annotated tag on `43998e9`) |
+| Post-release polish | ✅ `6898982` — README image gallery + `.gitattributes` language stats |
+
+### Post-release polish (`6898982`) — README visuals + GitHub language stats
+- [x] **README gallery (7 figures):** GitHub cannot render the plotly `.html` figures inline, so `scripts/export_readme_figures.py` (matplotlib-only, deterministic, reuses `src.causal.dag.build_dag_graph`) exports six `results/figures/readme_*.png` snapshots read from the committed result tables: DAG (email), six-estimator convergence vs oracle truth (R$), causal-vs-counterfactual ROI (symlog, CI whiskers), budget scenario nets, E-values, Qini. Plus the existing `13_sim_naive_conversion.png` in §6. Embedded in README §5/6/10/11/12/13/14 as Figures 1–7 with honest captions ("estimated (simulated)" vs "simulated ground truth").
+- [x] **`src/causal/dag.py`:** node/edge construction extracted to `build_dag_graph` (single source of truth) — plotly DAG output byte-identical (verified; only the random plotly div UUID differs, reverted as churn), `test_dag.py` 9/9.
+- [x] **Language stats:** `.gitattributes` marks plotly HTML, PNGs, result CSVs/parquet, and notebooks as `linguist-generated` (+ `*.md` documentation). GitHub's bar (previously ~94.5% HTML from 235 MB of committed plotly figures) now computes to ~**95% Python** + SQL/YAML — "mainly Python and other". Figures stay committed (report links + Install→results bundle intact).
+- [x] **README §22 quickstart fix:** the invalid `python -X utf8 sql/load.sql` line replaced with the actual loader invocations (`-m src.data.download_olist/load_olist/build_analytical/build_order_monthly`); §18 documents the regeneration command + attribution change.
+- [x] **Manifest + suite:** `readme_*.png` added to the deliverables manifest; full suite **374/374 green** (368 + 6 new manifest entries); figure churn reverted.
 
 ## Completed
 
@@ -263,5 +271,5 @@ None.
 
 ## Next actions
 
-1. **Complete.** All 21 roadmap days done; **Gate 3 validated by the human on 2026-09-23; release tag `v1.0` created and pushed** (annotated, on commit `43998e9`). Repository: `https://github.com/Daksh1308-Data-Science/Causal-Inference-for-Marketing-Attribution`.
+1. **Complete.** All 21 roadmap days done; **Gate 3 validated by the human on 2026-09-23; release tag `v1.0` created and pushed** (annotated, on commit `43998e9`). Post-release polish (`6898982`): README image gallery + `.gitattributes` language-stats fix — repository now reads as ~95% Python on GitHub. Repository: `https://github.com/Daksh1308-Data-Science/Causal-Inference-for-Marketing-Attribution`.
 2. Emerging storyline (Days 8–18): naive ≈ OLS ≈ IPW ≈ DR ≈ ATT ≈ mean-CATE because `sim_u` dominates. Day 16 quantified the money consequence — even causal ROI is positive for every channel (≈1,100%–17,000%) vs the counterfactual truth (email/search profitable; social/display −299%/−100%). Day 17 turned it into budget what-ifs on a fixed R$ 77,215 budget: any reallocation beats the as-run scatter (48→≥148k), email saturates at R$ 9,498, and no observed-data rule reaches the R$ 288,438 budget-constrained optimum. Day 18 closed the loop: an unmeasured confounder with RR ≈ 1.71 on both axes explains the whole spurious effect (E-value), the actual `sim_u` (δ ≈ 0.69–0.74 SD, γ = R$ 20.5/SD) reproduces 82–97% of every observed bias, and both placebos fail loudly. Day 19 productized it: the 7-page dashboard carries the honest framing on every page (single-source `HONEST_TOKEN`), renders headless-clean. Day 20 wrapped the whole build in a deliverables-manifest suite (86 tests: every artifact present + schemas + gate records green + honest labels everywhere), full suite 367/367. Day 21 packaged it: 25-section README, executive summary, pitches, interview Q&A, manifest-verified, full suite re-run green — the build is complete and **stopped at Gate 3 for final human validation**.
