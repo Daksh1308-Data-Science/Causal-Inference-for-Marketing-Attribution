@@ -88,6 +88,10 @@ REPORTS: list[str] = [
     "roi.md",
     "counterfactuals.md",
     "sensitivity.md",
+    # Day 21 portfolio docs
+    "executive_summary.md",
+    "pitches.md",
+    "interview_qa.md",
 ]
 
 # Honest-label roots every result label must carry (AGENTS.md §2/§8).
@@ -100,13 +104,15 @@ LABEL_ROOTS: tuple[str, ...] = (
     "observed",
     "measured",
 )
-_BANNED_LABEL = re.compile(r"established causal|caused by|^\s*causes?\b", re.IGNORECASE)
+# An unnegated "established causal" claim (the honest "NOT established causal"
+# phrasing must remain expressible), a bare "causes" label, or "caused by".
+_BANNED_LABEL = re.compile(r"(?<!not )established causal|caused by|^\s*causes?\b", re.IGNORECASE)
 # A channel causatively moving conversion/revenue — the correlation-vs-causation
 # line (AGENTS.md §8). "common cause", "effect, not a cause", "lost cause" are fine.
 _BANNED_CLAIM = re.compile(
     r"\b(?:email|social|search|display)\s+causes\b"
     r"|caused by\s+(?:email|social|search|display)\b"
-    r"|established causal",
+    r"|(?<!not )established causal",
     re.IGNORECASE,
 )
 

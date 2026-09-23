@@ -320,3 +320,14 @@ Status: **Accepted** unless noted. When a decision changes, add a new ADR overri
   - 86 new tests; **full suite 367/367** (282 + 85). The scenario-CI test exposed a first-draft misconception (assuming the CI encloses the truth-scale `net`) and was corrected to assert the actual estimated-scale semantics — the honest reading, not a wishful one.
   - The full-suite run rewrites `results/figures` HTML (plotly UUIDs) and a few CSVs at 1e-13/1e-14 precision; that churn is reverted before each commit (deterministic output, no float-noise diffs).
   - Day 21 (README + `v1.0`) now has a hard reproducibility gate to cite, then **Gate 3 (final human validation)**.
+
+## ADR-029 — Portfolio packaging: 25-section README + exec summary + pitches + interview Q&A; portfolio docs inside the honest-language manifest (Day 21)
+
+- **Date:** 2026-09-23 · **Status:** Accepted
+- **Context:** Day 21 must turn the validated build into a portfolio-grade package (roadmap hook "Install→results reproducible"): a 25-section README, a CMO-readable executive summary, 30s/2min/5min pitches, and interview Q&A. Two risks: (1) prose drifts from the numbers — a README that quotes a figure not in `results/` would violate AGENTS.md §2 (never fabricate); (2) marketing tone drifts into "email causes conversion" while every numeric artifact stays honest (AGENTS.md §8 survives into prose).
+- **Decision:**
+  1. **README (25 sections)** tells the arc Correlation → Causal Effect → Incremental Revenue → ROI → Budget Allocation with an explicit **§16 "what this analysis does NOT claim"**; every headline number was cross-checked against `results/*.csv` / `reports/*.md` before writing (master ATE rows, E-values 1.68–1.75, bias formula 82–97%, ROI observed/causal/counterfactual, scenario nets + estimated-scale CIs, cohort 94,983).
+  2. **Three portfolio docs** in `reports/`: `executive_summary.md` (CMO, 3–4 min, three-column ROI table + honest bottom line), `pitches.md` (30s/2min/5min, each with the non-negotiable honest-framing sentence), `interview_qa.md` (10 Q&As, every answer cites its backing artifact).
+  3. **Portfolio docs join the honest-language manifest** (ADR-028): added to `REPORTS` in `tests/test_artifacts.py`; the banned-claim regex now permits the **negated** honest phrase "NOT established causal" (`(?<!not )established causal`) so the docs can state what the analysis does *not* claim; the interview Q&A was rephrased to avoid even a *quoted* banned phrase. Full suite re-run green on the packaged state; figure churn reverted.
+- **Consequences:**
+  - The build is complete and **stopped at Gate 3 (final human validation)**. On approval: tag `v1.0` and push. Day 21 commit carries README + the three portfolio docs + manifest update (`tests/test_artifacts.py`) + docs (status/roadmap/decisions).

@@ -2,7 +2,7 @@
 
 Updated at the end of every day. Mirrors `docs/roadmap.md`.
 
-Last updated: **Day 20 — complete** (2026-09-23; Week 3 in progress)
+Last updated: **Day 21 — complete** (2026-09-23; Week 3 in progress)
 
 ## Current state
 
@@ -11,7 +11,7 @@ Last updated: **Day 20 — complete** (2026-09-23; Week 3 in progress)
 | Governance docs | ✅ Done (Day 0) |
 | Week 1 — Data + Causal framework (Days 1–7) | ✅ Complete (Gate 1 validated) |
 | Week 2 — Treatment effect estimation (Days 8–14) | ✅ Complete (Gate 2 validated) |
-| Week 3 — Business + robustness + product (Days 15–21) | 🟡 Day 20 complete; Day 21 (README + `v1.0`) next → Gate 3 after Day 21 |
+| Week 3 — Business + robustness + product (Days 15–21) | ✅ All 21 days complete — **awaiting Gate 3 (final human validation) → tag `v1.0`** |
 
 ## Completed
 
@@ -248,11 +248,19 @@ Last updated: **Day 20 — complete** (2026-09-23; Week 3 in progress)
   - **Honest vocabulary at bundle level** — every `label` column across all result CSVs uses the honest roots (estimated/simulated/placebo/counterfactual/naive/observed/measured) and never "established causal/caused by/…causes"; no channel-`causes` claim in any report (AGENTS.md §8 survives into prose)
 - [x] **Full suite: 367/367 tests pass** (282 + 85). **Day 20 validation hook green — Week 3 in progress.**
 
+### Day 21 — Docs + portfolio: README + `v1.0` package ✅
+- [x] **25-section `README.md`** — portfolio-grade: problem (attribution = correlation in disguise) → TL;DR (6 findings) → goals/scope → dataset & simulated layer → causal framework & assumptions → pipeline/layout → results chain (Days 3–20) → 4 findings (estimator convergence is a confounder; ROI money term; budget scenarios; E-value sensitivity) → heterogeneity → **honest framing (16: what this does NOT claim)** → dashboard → reproducibility → testing → stack → ADRs → quickstart → reports index → references → status/final word. Every number cross-checked against `results/*.csv` before writing (none fabricated).
+- [x] **`reports/executive_summary.md`** — CMO-facing, 3–4 min read: the trap, five-estimator convergence, the sim_u confounder (82–97%), E-value fragility, ROI table (observed/causal/counterfactual), budget story, honest bottom line.
+- [x] **`reports/pitches.md`** — 30s / 2min / 5min pitches, each with the non-negotiable honest-framing sentence.
+- [x] **`reports/interview_qa.md`** — 10 Q&As (estimator convergence, randomization, unmeasured confounding, positivity, DoWhy, ROI contradiction, budget advice, reproducibility proof, limitations, hire-me) — every answer cites the backing artifact.
+- [x] **Hardening:** portfolio docs added to the deliverables manifest; banned-claim regex now permits the honest "NOT established causal" negation (reports can say what the analysis does NOT claim); `reports/*.md` scanned for unnegated causal claims → green.
+- [x] **Final reproducibility attestation:** full suite re-run green on the packaged state; figure churn reverted. **Day 21 validation hook green — awaiting Gate 3.**
+
 ## Blockers
 
 None.
 
 ## Next actions
 
-1. Week 3 in progress (Gate 2 approved): Day 19 (Streamlit dashboard) ✅, Day 20 (tests + hardening) ✅, Day 21 (README + `v1.0`) next → **Gate 3 (final validation)**.
-2. Emerging storyline (Days 8–18): naive ≈ OLS ≈ IPW ≈ DR ≈ ATT ≈ mean-CATE because `sim_u` dominates. Day 16 quantified the money consequence — even causal ROI is positive for every channel (≈1,100%–17,000%) vs the counterfactual truth (email/search profitable; social/display −299%/−100%). Day 17 turned it into budget what-ifs on a fixed R$ 77,215 budget: any reallocation beats the as-run scatter (48→≥148k), email saturates at R$ 9,498, and no observed-data rule reaches the R$ 288,438 budget-constrained optimum. Day 18 closed the loop: an unmeasured confounder with RR ≈ 1.71 on both axes explains the whole spurious effect (E-value), the actual `sim_u` (δ ≈ 0.69–0.74 SD, γ = R$ 20.5/SD) reproduces 82–97% of every observed bias, and both placebos fail loudly. Day 19 productized it: the 7-page dashboard carries the honest framing on every page (single-source `HONEST_TOKEN`), renders headless-clean. Day 20 wrapped the whole build in a deliverables-manifest suite (86 tests: every artifact present + schemas + gate records green + honest labels everywhere), full suite 367/367. Day 21 finishes the product (README + `v1.0`), then **Gate 3**.
+1. **All 21 roadmap days complete.** Gate 3 (final human validation) pending → on approval, tag `v1.0` and push the tag. See `README.md` §25 and `docs/roadmap.md` for the packaging recap.
+2. Emerging storyline (Days 8–18): naive ≈ OLS ≈ IPW ≈ DR ≈ ATT ≈ mean-CATE because `sim_u` dominates. Day 16 quantified the money consequence — even causal ROI is positive for every channel (≈1,100%–17,000%) vs the counterfactual truth (email/search profitable; social/display −299%/−100%). Day 17 turned it into budget what-ifs on a fixed R$ 77,215 budget: any reallocation beats the as-run scatter (48→≥148k), email saturates at R$ 9,498, and no observed-data rule reaches the R$ 288,438 budget-constrained optimum. Day 18 closed the loop: an unmeasured confounder with RR ≈ 1.71 on both axes explains the whole spurious effect (E-value), the actual `sim_u` (δ ≈ 0.69–0.74 SD, γ = R$ 20.5/SD) reproduces 82–97% of every observed bias, and both placebos fail loudly. Day 19 productized it: the 7-page dashboard carries the honest framing on every page (single-source `HONEST_TOKEN`), renders headless-clean. Day 20 wrapped the whole build in a deliverables-manifest suite (86 tests: every artifact present + schemas + gate records green + honest labels everywhere), full suite 367/367. Day 21 packaged it: 25-section README, executive summary, pitches, interview Q&A, manifest-verified, full suite re-run green — the build is complete and **stopped at Gate 3 for final human validation**.
