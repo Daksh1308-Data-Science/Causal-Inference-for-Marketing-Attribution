@@ -44,7 +44,7 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 |-----|-------|----------------------|-------------|------------|--------|:------:|
 | 15 | CATE segments | Segment deep-dive: high/zero/negative effects → targeting guidance | Target-segment table | Segments explain pattern | `Day 15: CATE segmentation` | ✅ |
 | 16 | ROI | Cost assumptions in config; observational vs causal ROI table | `reports/roi` | ROI complete per channel | `Day 16: incremental ROI` | ✅ |
-| 17 | Counterfactuals | Scenarios A–D simulator + bootstrap uncertainty + extrapolation limits | `results/counterfactuals` | Uncertainty reported; limits stated | `Day 17: counterfactual simulator` | ⬜ |
+| 17 | Counterfactuals | Scenarios A–D simulator + bootstrap uncertainty + extrapolation limits | `results/counterfactuals` | Uncertainty reported; limits stated | `Day 17: counterfactual simulator` | ✅ |
 | 18 | Sensitivity | E-value, bias formula, placebo tests, alt adjustment sets/estimators; "how strong must U be?" | `reports/sensitivity` | Each claim stress-tested | `Day 18: sensitivity analysis` | ⬜ |
 | 19 | Dashboard | 7-page Streamlit wired to `results/` | `dashboard/` app | All pages render | `Day 19: Streamlit dashboard` | ⬜ |
 | 20 | Tests + polish | pytest suite (env gate, schema, ground-truth recovery, dashboard data); config; docs | Green test suite | `pytest` passes | `Day 20: tests + hardening` | ⬜ |
@@ -56,9 +56,9 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 
 ## Progress summary (updated after every day)
 
-- **Completed:** Day 0, Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7, Day 8, Day 9, Day 10, Day 11, Day 12, Day 13, Day 14, Day 15, Day 16
-- **In progress:** Day 17 (counterfactual simulator)
-- **Next up:** Day 17 — counterfactual budget scenarios from the ROI story
+- **Completed:** Day 0, Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7, Day 8, Day 9, Day 10, Day 11, Day 12, Day 13, Day 14, Day 15, Day 16, Day 17
+- **In progress:** Day 18 (sensitivity — "how strong must U be?")
+- **Next up:** Day 18 — sensitivity analysis (E-value / bias formula on the unobserved `sim_u`)
 - **Blockers:** none
 
 > ✅ Day 2 validation hook green: 50/50 tests pass (25 env gate + 25 data schema/cohort/RFM), cohort = 94,983, no dupes, RFM plausible. See `docs/status.md`.
@@ -90,3 +90,5 @@ Execution plan per `Plan.md` §20. Status legend: ⬜ not started · 🟡 in pro
 > ✅ Day 15 validation hook green: CATE segmentation — 13 tests pass; target-segment table (5 bands + `all` per channel × outcome) + per-channel Run/Skip/No-budget guidance; all 6 gates green, incl. the honest pattern: every estimated CATE is positive in every band (shared `sim_u` bias — observed data cannot recover even the sign), while the counterfactual oracle shows email/search +, social −, display 0; rank gradient real but tiny (top−bottom oracle +0.13/+0.17 pp, ρ 0.05–0.06); full suite 213/213. Gate 2 approved by the human. See `docs/status.md`.
 
 > ✅ Day 16 validation hook green: incremental ROI — 12 tests pass; ROI per channel from cost assumptions (ADR-006 config), three methods (observational / causal DR / counterfactual oracle) + cohort net values; all 6 gates green, incl. the money terms of the sim_u story: even causal ROI is positive for every channel (1,112%–17,265%) while the counterfactual truth is social −299% and display −100%, with causal÷truth overstatement ~7.5x email / ~11x search; full suite 225/225. See `docs/status.md`.
+
+> ✅ Day 17 validation hook green: counterfactual scenarios — 15 tests pass; budget what-ifs on a fixed R$ 77,215 budget (as_run / naive / causal / ctf_guided), extrapolation flags where implied treated exceeds the observed range, estimated-scale 95% CI propagated through the linear scenario transform from the Day-12 DR revenue ATE CIs; all 8 gates green, incl. cross-day consistency (as_run reproduces Day-16 cohort nets) and the honest finding: any reallocation beats the as-run scatter (min R$ 147,922 vs 48,084) but the naive spread tops the ranking via an email-saturation artifact (email saturates at R$ 9,498; wider spreads waste less), no scenario reaches the R$ 288,438 budget-constrained optimum — observed-data rules still fund sim_u-inflated channels (counterfactual net = 2.7–10.3% of the estimated CI lower bound, ≈10–38× overstatement); full suite 240/240. See `docs/status.md`.

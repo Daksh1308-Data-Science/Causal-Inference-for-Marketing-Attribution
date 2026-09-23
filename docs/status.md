@@ -2,7 +2,7 @@
 
 Updated at the end of every day. Mirrors `docs/roadmap.md`.
 
-Last updated: **Day 16 — complete** (2026-09-22; Week 3 in progress)
+Last updated: **Day 17 — complete** (2026-09-22; Week 3 in progress)
 
 ## Current state
 
@@ -11,7 +11,7 @@ Last updated: **Day 16 — complete** (2026-09-22; Week 3 in progress)
 | Governance docs | ✅ Done (Day 0) |
 | Week 1 — Data + Causal framework (Days 1–7) | ✅ Complete (Gate 1 validated) |
 | Week 2 — Treatment effect estimation (Days 8–14) | ✅ Complete (Gate 2 validated) |
-| Week 3 — Business + robustness + product (Days 15–21) | 🟡 Day 16 complete; Day 17 (counterfactuals) next → Gate 3 after Day 21 |
+| Week 3 — Business + robustness + product (Days 15–21) | 🟡 Day 17 complete; Day 18 (sensitivity) next → Gate 3 after Day 21 |
 
 ## Completed
 
@@ -206,11 +206,21 @@ Last updated: **Day 16 — complete** (2026-09-22; Week 3 in progress)
 - [x] `tests/test_roi.py` — 12 tests: schema/labels/n_treated from frame, cost-from-config, CI propagation + uncertainty, the honest causal-vs-counterfactual pattern, overstatement multiple, cohort net, gates pass, **gate non-vacuity** (display ctf flipped to positive ⇒ gate fails; search causal ROI flipped negative ⇒ gate fails), determinism, artifacts + report content, no literal escapes
 - [x] **Full suite: 225/225 tests pass** (213 + 12 roi). **Day 16 validation hook green — Week 3 in progress.**
 
+### Day 17 — Counterfactual budget scenarios ✅
+- [x] `configs/config.yaml`: `counterfactuals:` block — scenario list `[as_run, naive, causal, ctf_guided]`, cohort cap (94,983), gate thresholds (`as_run_net_tol`, `realloc_beat_min_margin`, `optimum_min_margin`) + `results.counterfactuals` path
+- [x] `src/causal/counterfactuals.py` — **model-based counterfactual estimates** (labeled `counterfactual (simulated ground truth), model-based` on every row): fixed budget = as-run spend (R$ 77,215, from Day-16 costs × treated); four allocations re-split it — as_run (as executed), naive (∝ last-touch revenue attribution), causal (∝ Day-12 DR causal ROI), ctf_guided (∝ counterfactual ROI, positive channels only). Mechanics: spend → implied treated → capped at cohort with ⚠ **extrapolation flag** → incremental revenue at DGP oracle per-treated effect → net. `budget_optimum()` = budget-constrained linear optimum (greedy email-then-search); 1 figure; report
+- [x] **Honest finding (reported, not gated):** any reallocation beats the as-run scatter (worst reallocation R$ 147,922 vs R$ 48,084 — naive 163,983 > ctf_guided 158,605 > causal 147,922 > as_run 48,084). But the naive spread tops the ranking only via an **email-saturation artifact**: email saturates at R$ 9,498 spend (whole cohort treated), so wider spreads "win" by wasting less on the saturated channel — they still burn R$ 69,140 on social/display (true effects negative/zero). No rule-based scenario reaches the optimum (R$ 288,438, email→search only) — observed-data rules keep funding negative-counterfactual channels because every estimate is sim_u-inflated. Nothing about the ranking endorses a confounded rule
+- [x] **Uncertainty reported (roadmap hook):** scenario totals carry an estimated-scale 95% CI propagated exactly through the linear transform from the Day-12 DR revenue ATE CIs (treated counts fixed per scenario ⇒ monotone linear combination). The CI brackets the sim_u-inflated estimates, NOT the counterfactual point — the gap is the bias at portfolio level: counterfactual net is 2.7–10.3% of the CI lower bound (**≈10–38× overstatement**)
+- [x] `results/counterfactuals/{scenarios,scenario_summary,gates}.csv`, `results/figures/counterfactual_scenarios.html` (stacked net by channel per scenario, ⚠ markers), `reports/counterfactuals.md`
+- [x] **Validation hooks — all 8 gates green:** scenarios_complete, as_run_reproduces_day16 (cross-day consistency with Day-16 cohort nets, max dev 0.00), reallocations_beat_as_run (+99,838), email_saturation_documented (3 email cells flagged), bounded_by_optimum (margin 124,455), extrapolation_flagged (no silent extrapolation), labels_correct, uncertainty_reported (finite ordered CI on every scenario total)
+- [x] `tests/test_counterfactuals.py` — 15 tests: schema/labels, spends sum to budget, as_run↔Day-16 consistency, ranking/purity (as_run last, monotonic), email saturation + zero-spend ctf_guided cells, bounded-by-optimum, CI columns + bias-gap magnitude, gates pass, **gate non-vacuity** (naive inflated past optimum ⇒ bounded_by_optimum fails; email un-flagged ⇒ saturation gate fails; causal deflated below as_run ⇒ realloc gate fails; CI bounds inverted ⇒ uncertainty gate fails), determinism, artifacts + report content, no literal escapes
+- [x] **Full suite: 240/240 tests pass** (225 + 15 counterfactuals). **Day 17 validation hook green — Week 3 in progress.**
+
 ## Blockers
 
 None.
 
 ## Next actions
 
-1. Week 3 in progress (Gate 2 approved): Day 17 (counterfactual simulator — budget scenarios), Day 18 (sensitivity — "how strong must U be?"), Day 19 (Streamlit dashboard), Day 20 (tests + polish), Day 21 (README + `v1.0`) → **Gate 3 (final validation)**.
-2. Emerging storyline (Days 8–16): naive ≈ OLS ≈ IPW ≈ DR ≈ ATT ≈ mean-CATE because `sim_u` dominates — Day 16 now quantifies the business consequence: even causal ROI is positive for every channel (≈1,100%–17,000%), while the counterfactual truth is email/search profitable and social/display value-destroying (true ROI −100%/−299%). The observed-X targeting signal is near-flat and sign-blind (Days 13–15). Day 18 bounds how strong `sim_u` must be; Day 17 turns the ROI story into explicit budget scenarios.
+1. Week 3 in progress (Gate 2 approved): Day 18 (sensitivity — "how strong must U be?"), Day 19 (Streamlit dashboard), Day 20 (tests + polish), Day 21 (README + `v1.0`) → **Gate 3 (final validation)**.
+2. Emerging storyline (Days 8–17): naive ≈ OLS ≈ IPW ≈ DR ≈ ATT ≈ mean-CATE because `sim_u` dominates. Day 16 quantified the money consequence — even causal ROI is positive for every channel (≈1,100%–17,000%) vs the counterfactual truth (email/search profitable; social/display −299%/−100%). Day 17 turned it into budget what-ifs on a fixed R$ 77,215 budget: any reallocation beats the as-run scatter (48→≥148k), email saturates at R$ 9,498, and no observed-data rule reaches the R$ 288,438 budget-constrained optimum because all estimators are sim_u-inflated. Day 18 bounds how strong `sim_u` must be (E-value / bias formula); Days 19–21 productize.

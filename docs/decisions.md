@@ -264,3 +264,17 @@ Status: **Accepted** unless noted. When a decision changes, add a new ADR overri
   - Breakeven reads: email/search profitable at any cost below their true incremental revenue (R$ 2.41 / R$ 3.02 per treated); social/display can never break even — no cost assumption rescues them.
   - Cohort net value (counterfactual): +R$ 65,673 email, +R$ 48,167 search, −R$ 58,661 social, −R$ 7,094 display.
   - 6 gates green; full suite 225/225. Sets up Day 17 (counterfactual budget scenarios from these numbers) and Day 18 (sensitivity).
+
+## ADR-025 — Counterfactual budget scenarios: fixed as-run budget, extrapolation caps + flags, CI propagated from Day-12 DR, honest gate set (Day 17)
+
+- **Date:** 2026-09-22/23 · **Status:** Accepted
+- **Context:** Day 17 must deliver "Scenarios A–D simulator + bootstrap uncertainty + extrapolation limits" (`results/counterfactuals`, hook "Uncertainty reported; limits stated"). Hazards: (1) scenario arithmetic is deterministic-linear on Day-16/ROI numbers, so bootstrap adds ~2h of runtime to reproduce what exact analytic CIs already give; (2) the naive first draft's "truth-wins" expectation was false on the data — an email-saturation artifact lets the naive spread top the counterfactual ranking (AGENTS.md rule 8: report what the data says, gate what is robust).
+- **Decision:**
+  1. **Fixed total budget = as-run spend** (Σ cost × observed treated = R$ 77,215). Four scenarios re-split it: `as_run` (as executed), `naive` (∝ last-touch revenue attribution), `causal` (∝ Day-12 DR causal ROI), `ctf_guided` (∝ counterfactual ROI, positive channels only). Every row labeled `counterfactual (simulated ground truth), model-based`.
+  2. **Extrapolation limits (blueprint §9):** implied treated = spend/cost; cells exceeding the observed n_treated are capped at the cohort (94,983 — the analysis population, NOT the sum of per-channel treated = 120,235) and flagged ⚠. No silent extrapolation (gate).
+  3. **Uncertainty reported without bootstrap:** net = Σ treated × (inc − cost) with treated fixed per scenario is a non-negative linear combination, so the 95% CI propagates exactly from the Day-12 DR revenue ATE CIs; the CI brackets the sim_u-inflated estimated scale, not the counterfactual point (the gap IS the documented bias).
+  4. **Gates on robust claims only:** scenarios_complete; as_run_reproduces_day16 (cross-day consistency check against Day-16 cohort nets); reallocations_beat_as_run (any re-split beats the observed scatter); email_saturation_documented (the cap bites); bounded_by_optimum (no scenario exceeds the budget-constrained greedy email→search optimum); extrapolation_flagged; labels_correct; uncertainty_reported. The naive-topping-artifact is *reported, not gated*.
+- **Consequences:**
+  - Ranking (counterfactual net): naive 163,983 > ctf_guided 158,605 > causal 147,922 > as_run 48,084. Any reallocation beats as_run by ≥ R$ 99,838. The naive win is an email-saturation artifact (email saturates at R$ 9,498 spend; wider spreads waste less there) — it still burns R$ 69,140 on social/display. Budget-constrained optimum = R$ 288,438 (email to saturation, then search; never social/display); no observed-data rule reaches it.
+  - Bias at portfolio level: counterfactual net = 2.7–10.3% of the estimated-scale CI lower bound → **≈10–38× overstatement** across scenarios.
+  - 8 gates green; full suite 240/240. Sets up Day 18 (sensitivity: how strong must `sim_u` be?) and Day 19 (Streamlit dashboard).

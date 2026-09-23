@@ -1,0 +1,9 @@
+gate,scope,value,threshold,passed,detail
+scenarios_complete,all scenarios,20.0,20.0,True,every scenario x channel row present; channel spends sum to the fixed budget per scenario
+as_run_reproduces_day16,as_run vs Day-16,0.0,0.01,True,as_run per-channel nets match the Day-16 counterfactual cohort nets within tolerance
+reallocations_beat_as_run,reallocation scenarios,99837.78,0.0,True,every reallocation scenario's total net > as_run total net (the observed spend scatter is worse than any re-split)
+email_saturation_documented,email cells,3.0,1.0,True,"email reaches cohort saturation in >= 1 scenario (the cap bites -> budget beyond ~R$9.5k on email is waste, documented in the report)"
+bounded_by_optimum,all scenarios,124455.4,0.0,True,max scenario total net <= the budget-constrained linear optimum (greedy email-then-search)
+extrapolation_flagged,all scenario x channel cells,0.0,0.0,True,every over-observed-treated cell carries the extrapolation flag (no silent extrapolation)
+labels_correct,all rows,1.0,1.0,True,"every row labelled 'counterfactual (simulated ground truth), model-based'"
+uncertainty_reported,scenario totals (estimated scale),1.0,1.0,True,"every scenario total carries finite, ordered CI propagated from the Day-12 DR revenue ATE CIs (brackets the sim_u-inflated estimated net, not the counterfactual point - the gap is the documented bias)"

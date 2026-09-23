@@ -17,6 +17,7 @@ results:
   uplift: uplift       # results/uplift (Day 14)
   target_segments: target_segments  # results/target_segments (Day 15)
   roi: roi                          # results/roi (Day 16)
+  counterfactuals: counterfactuals  # results/counterfactuals (Day 17)
 
 # --- Reproducibility ---
 seed: 42
@@ -89,6 +90,23 @@ roi:
   ctf_social_display_max_roi: 0.0   # hook: counterfactual ROI negative for social/display
   overstatement_min_gt: 1.0         # hook: causal ROI / counterfactual ROI > this for email/search
                                     #       (documented overstatement multiple)
+
+# --- Counterfactual budget scenarios (Day 17; blueprint §9) ---
+# Fixed total budget = as-run campaign spend (cost x treated, computed from the
+# Day-16 config costs). Scenarios re-split the SAME budget. Every result is a
+# model-based counterfactual estimate (simulation-only) per AGENTS.md §2.
+counterfactuals:
+  scenarios: [as_run, naive, causal, ctf_guided]  # as_run = as executed; naive = attribution-weighted;
+                                              # causal = Day-12 DR causal ROI; ctf_guided = DGP-informed
+                                              # (positive counterfactual-ROI channels only)
+  cohort_cap: 0                   # cap implied treated at the cohort size (0 -> 94,983) when a
+                                  # scenario's spend/cost exceeds the observed treated range
+  as_run_net_tol: 0.01            # hook: as_run per-channel nets match the Day-16 counterfactual
+                                  #       cohort nets within R$ (cross-day consistency check)
+  realloc_beat_min_margin: 0.0    # hook: every reallocation scenario total net > as_run total net
+                                  #       (the observed spend scatter is worse than any re-split)
+  optimum_min_margin: 0.0         # hook: max scenario total net <= the budget-constrained linear
+                                  #       optimum (greedy email-then-search, positive channels only)
 
 # --- Simulated marketing layer (design: docs/data-feasibility.md §4) ---
 # Day 3 ships a clearly-labeled PREVIEW of the layer so channel descriptive
